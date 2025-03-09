@@ -22,7 +22,7 @@
         - Hostname : `localhost`
         - Port : `3306`
         - Username : `myuser` or `root` for elevated access
-        - Password : `mypassword` or `//` for root user
+        - Password : `mypassword` or `rootpassword` for root user
   3.  Click 'Test Connection' and Save
 
 **4.  Terminate Connection**
