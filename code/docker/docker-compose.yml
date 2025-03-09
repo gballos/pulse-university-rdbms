@@ -1,0 +1,18 @@
+version: '3.8'  # Docker Compose file format version
+
+services:
+  db:
+    image: mysql:8  # Pulls the official MySQL 8 image
+    container_name: pulse_uni_db_container  # Name of the container
+    restart: always  # Ensures MySQL restarts if it crashes
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Root password for MySQL
+      MYSQL_DATABASE: mydatabase  # Default database to create
+      MYSQL_USER: myuser  # Non-root user
+      MYSQL_PASSWORD: mypassword  # Password for the non-root user
+    ports:
+      - "3306:3306"  # Exposes MySQL on port 3306 for external access
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persistent storage for database files
+volumes:
+  mysql_data:  # Named volume for data persistence
