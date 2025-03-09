@@ -14,9 +14,9 @@ catch {
     exit 1
 }
 
-# Start containers (FIXED COMMAND)
+# Start containers
 echo "Starting MySQL container..."
-docker-compose -f $composeFile up -d  # Use hypenated "docker-compose"
+docker-compose -f $composeFile up -d
 
 # Wait for MySQL to initialize
 echo "Waiting for MySQL to initialize..."
@@ -28,8 +28,8 @@ do {
     $healthStatus = docker inspect --format "{{.State.Health.Status}}" $containerName 2>$null
     echo "Current status: $healthStatus"
     
-    # Timeout check
-    if ((Get-Date) - $startTime).TotalSeconds -gt $timeout) {
+    # Timeout check (FIXED SYNTAX)
+    if ( ((Get-Date) - $startTime).TotalSeconds -gt $timeout ) {
         echo "`n❌ Timeout waiting for MySQL to start"
         docker logs $containerName
         exit 1
