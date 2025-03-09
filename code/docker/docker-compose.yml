@@ -14,5 +14,6 @@ services:
       - "3306:3306"  # Exposes MySQL on port 3306 for external access
     volumes:
       - mysql_data:/var/lib/mysql  # Persistent storage for database files
+      - ./../../sql:/docker-entrypoint-initdb.d  # Critical for SQL auto-execution
 volumes:
   mysql_data:  # Named volume for data persistence
