@@ -37,7 +37,7 @@ CREATE TABLE STAGES (
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
 CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
 	event_id INT USNIGNED NOT NULL AUTO_INCREMENT,
-    festival_id INT UNSIGNED NOT NULL,
+	festival_id INT UNSIGNED NOT NULL,
     stage_id INT  UNSIGNED NOT NULL,
     event_date DATE,
     duration INT,  -- again, in minutes?
@@ -46,7 +46,59 @@ CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
     FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
 );
 
-DROP TABLE IS EXISTS PERFORMANCE_TYPES;
+DROP TABLE IF EXISTS MUSIC_TYPES;
+CREATE TABLE MUSIC_TYPES(
+	music_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	music_type VARCHAR(20),
+	PRIMARY KEY(music_type_id)
+)
+
+DROP TABLE IF EXISTS MUSIC_SUBTYPES;
+CREATE TABLE MUSIC_SUBTYPES(
+	music_subtype_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	music_subtype VARCHAR(20),
+	PRIMARY KEY(music_subtype_id)
+)
+	
+DROP TABLE IF EXISTS ARTISTS;
+CREATE TABLE ARTISTS(
+	artist_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	first_name VARCHAR(25),
+	last_name VARCHAR(25),
+	nickname VARCHAR(25),
+	music_type_id INT UNSIGNED,
+	music_subtype_id INT UNSIGNED,
+	website VARCHAR(100) CHECK(website like 'https://%'),
+	instagram VARCHAR(50),
+	PRIMARY KEY(artist_id),
+	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+)	
+
+DROP TABLE IF EXISTS BANDS;
+CREATE TABLE BANDS(
+	band_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name VARCHAR(25),
+	date_of_creation DATE,
+	music_type_id INT UNSIGNED,
+	music_subtype_id INT UNSIGNED,
+	website VARCHAR(100) CHECK(website like 'https://%'),
+	instagram VARCHAR(50),
+	PRIMARY KEY(band_id),
+	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+)
+	
+DROP TABLE IF EXISTS ARTISTS_X_BANDS; --Many to many relationship
+CREATE TABLE ARTISTS_X_BANDS(
+	artist_id INT UNSIGNED,
+	band_id INT UNSIGNED,
+	PRIMARY KEY(artist_id, band_id),
+	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id)
+	FOREIGN KEY(band_id) REFERENCES BANDS(band_id)
+)
+	
+DROP TABLE IF EXISTS PERFORMANCE_TYPES;
 CREATE TABLE PERFORMANCE_TYPES (
 	performance_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     performance_type VARCHAR(50),
@@ -61,7 +113,7 @@ CREATE TABLE PERFORMANCES (
     performance_time TIME,
     duration INT,
     order_in_show INT,
-    is_group_or_solo BOOLEAN,
+    is_solo BOOLEAN,
     -- artist_or_group_id INT NOT NULL,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id)  REFERENCES PERFORMANCE_TYPES(performance_type_id),
