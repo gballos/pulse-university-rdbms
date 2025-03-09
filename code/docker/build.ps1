@@ -5,7 +5,7 @@ $ErrorActionPreference = "Stop"
 $containerName = "pulse_uni_db_container"
 
 echo "Starting MySQL container..."
-docker-compose up -d
+docker compose up -d
 
 # Wait for MySQL to initialize
 echo "Waiting for MySQL to initialize..."
