@@ -1,34 +1,29 @@
-# Stop execution on error
-$ErrorActionPreference = "Stop"
-
-# Set MySQL container name
-$containerName = "pulse_uni_db_container"
-
+# Start containers
 echo "Starting MySQL container..."
-docker compose up -d
+docker compose -f $composeFile up -d
 
-# Wait for MySQL to initialize
+# Wait for MySQL to become healthy
 echo "Waiting for MySQL to initialize..."
-Start-Sleep -Seconds 10
+do {
+    Start-Sleep -Seconds 5
+    $healthStatus = docker inspect --format "{{.State.Health.Status}}" $containerName 2>$null
+    echo "Current status: $healthStatus"
+} until ($healthStatus -eq "healthy")
 
-# Load SQL scripts
-echo "Loading database schema and data..."
-docker exec -i $containerName mysql -u root -prootpassword ../../sql/install.sql
-#docker exec -i $containerName mysql -u root -prootpassword ../../sql/load_data.sql
-docker exec -i $containerName mysql -u root -prootpassword ../../sql/triggers.sql
+# Verify container status
+echo "`nFinal verification..."
+$runningContainers = docker ps --filter "name=$containerName" --format "{{.Names}}"
 
-echo "MySQL setup complete!"
-
-# Check if the container is running
-$runningContainers = docker ps --format "{{.Names}}"
 if ($runningContainers -match $containerName) {
-    echo "MySQL is running on localhost:3306"
-} else {
-    echo "MySQL container is not running. Check logs with: docker logs $containerName"
+    echo "`n✅ MySQL is running successfully!"
+    echo "`nConnection details:"
+    echo "   Host: localhost"
+    echo "   Port: 3306"
+    echo "   User: myuser"
+    echo "   Password: mypassword"
+    echo "`nYou can now connect using MySQL Workbench or CLI."
 }
-
-echo "Connect using MySQL Workbench with:"
-echo "   - Host: localhost"
-echo "   - Port: 3306"
-echo "   - User: myuser"
-echo "   - Password: mypassword"
+else {
+    echo "`n❌ Container failed to start. Check logs with: docker logs $containerName"
+    exit 1
+}
