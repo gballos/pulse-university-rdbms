@@ -14,9 +14,9 @@ catch {
     exit 1
 }
 
-# Start containers
+# Start containers (FIXED COMMAND FOR V2)
 echo "Starting MySQL container..."
-docker-compose -f $composeFile up -d
+docker compose -f $composeFile up -d
 
 # Wait for MySQL to initialize
 echo "Waiting for MySQL to initialize..."
