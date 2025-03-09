@@ -1,6 +1,6 @@
-DROP SCHEMA IF EXISTS 'pulse_uni_db';
-CREATE SCHEMA 'pulse_uni_db';
-USE 'pulse_uni_db';
+DROP SCHEMA IF EXISTS pulse_uni_db;
+CREATE DATABASE pulse_uni_db;
+USE pulse_uni_db;
 
 DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
