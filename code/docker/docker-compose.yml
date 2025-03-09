@@ -1,31 +1,26 @@
-version: '3.8'  # Docker Compose file format version
+version: '3.8'
 
 services:
   db:
-    image: mysql:8  # Pulls the official MySQL 8 image
-    container_name: pulse_uni_db_container  # Name of the container
-    restart: always  # Ensures MySQL restarts if it crashes
+    image: mysql:8
+    container_name: pulse_uni_db_container
+    restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword  # Root password for MySQL
-      MYSQL_DATABASE: mydatabase  # Default database to create
-      MYSQL_USER: myuser  # Non-root user
-      MYSQL_PASSWORD: mypassword  # Password for the non-root user
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydatabase
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
     ports:
-      - "3306:3306"  # Exposes MySQL on port 3306 for external access
+      - "3306:3306"
     volumes:
-      - mysql_data:/var/lib/mysql  # Persistent storage for database files
-      - ./../../sql:/docker-entrypoint-initdb.d  # Critical for SQL auto-execution
+      - mysql_data:/var/lib/mysql
+      - ./../../sql:/docker-entrypoint-initdb.d
     healthcheck:
-      test: 
-        [
-          "CMD-SHELL",
-          "mysql -u root -prootpassword -e 'SELECT 1'",
-          "&&",
-          "[ -f /var/lib/mysql/.initialized ]"
-        ]
+      test: ["CMD-SHELL", "mysql -u root -prootpassword -e 'SELECT 1'"]
       interval: 10s
       timeout: 15s
-      retries: 10
-      start_period: 40s
-  volumes:
-  mysql_data:  # Named volume for data persistence
+      retries: 12
+      start_period: 30s
+
+volumes:
+  mysql_data:
