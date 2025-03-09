@@ -13,9 +13,9 @@ Start-Sleep -Seconds 10
 
 # Load SQL scripts
 echo "Loading database schema and data..."
-docker exec -i $containerName mysql -u root -prootpassword < ../../sql/install.sql
-#docker exec -i $containerName mysql -u root -prootpassword < ../../sql/load_data.sql
-docker exec -i $containerName mysql -u root -prootpassword < ../../sql/triggers.sql
+docker exec -i $containerName mysql -u root -prootpassword ../../sql/install.sql
+#docker exec -i $containerName mysql -u root -prootpassword ../../sql/load_data.sql
+docker exec -i $containerName mysql -u root -prootpassword ../../sql/triggers.sql
 
 echo "MySQL setup complete!"
 
