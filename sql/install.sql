@@ -114,11 +114,15 @@ CREATE TABLE PERFORMANCES (
     duration INT,
     order_in_show INT,
     is_solo BOOLEAN,
-    -- artist_or_group_id INT NOT NULL,
+    performer_id INT UNSIGNED,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id)  REFERENCES PERFORMANCE_TYPES(performance_type_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
-    -- FOREIGN KEY( ) artists/group id ?
+    -- Ensuring performer_id exists in the referenced table
+    CONSTRAINT chk_performer CHECK (
+        (is_solo = 0 AND performer_id IN (SELECT artist_id FROM ARTISTS)) OR
+        (is_solo = 1 AND performer_id IN (SELECT band_id FROM BANDS)) --No literal reference to artists/bands - Delete trigger needed
+    )
 );
 
 DROP TABLE IF EXISTS STAFF;
@@ -133,3 +137,4 @@ CREATE TABLE STAFF (
     PRIMARY KEY(staff_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 ); 
+
