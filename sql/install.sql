@@ -69,30 +69,15 @@ CREATE TABLE PERFORMANCES (
     -- FOREIGN KEY( ) artists/group id ?
 );
 
-
-CREATE TABLE STAFF_CATEGORIES (
-	staff_category_id INT NOT NULL,
-    staff_category_description VARCHAR(50),
-    PRIMARY KEY(staff_category_id)
-);
-
-CREATE TABLE LEVELS_OF_EXPERTISE (
-	level_id INT NOT NULL,
-    level_description VARCHAR(50),
-    PRIMARY KEY(level_id)
-);
-
 DROP TABLE IF EXISTS STAFF;
 CREATE TABLE STAFF (
 	staff_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_category_id INT NOT NULL,
-    level_id INT NOT NULL,
+    staff_category VARCHAR(15) CHECK(staff_category in ('technical', 'security', 'general')).
+    level_of_expertise VARCHAR(10) CHECK(level_of_expertise in ('junior', 'mid', 'developer')),
     event_id INT UNSIGNED NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     age INT,
     PRIMARY KEY(staff_id),
-    FOREIGN KEY(staff_category_id) REFERENCES STAFF_CATEGORIES(staff_category_id),
-    FOREIGN KEY(level_id) REFERENCES LEVELS_OF_EXPERTISE(level_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 ); 
