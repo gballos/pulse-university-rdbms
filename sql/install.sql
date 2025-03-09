@@ -129,7 +129,7 @@ DROP TABLE IF EXISTS STAFF;
 CREATE TABLE STAFF (
 	staff_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     staff_category VARCHAR(15) CHECK(staff_category in ('technical', 'security', 'general')).
-    level_of_expertise VARCHAR(10) CHECK(level_of_expertise in ('junior', 'mid', 'developer')),
+    level_of_expertise VARCHAR(10) CHECK(level_of_expertise in ('trainee', 'junior', 'mid', 'senior', 'manager')),
     event_id INT UNSIGNED NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
@@ -138,3 +138,29 @@ CREATE TABLE STAFF (
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 ); 
 
+DROP TABLE IF EXISTS VISITORS;
+CREATE TABLE VISITORS(
+	visitor_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	first_name VARCHAR(20),
+	last_name VARCHAR(20),
+	phone_number VARCHAR(20),
+	email VARCHAR(20),
+	age INT,
+	PRIMARY KEY(visitor_id)
+)
+
+DROP TABLE IF EXISTS TICKETS;
+CREATE TABLE TICKETS(
+	ticket_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	event_id INT UNSIGNED,
+	vistor_id INT UNSIGNED,
+	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	payment_method VARCHAR(15) CHECK(payment_method in ('credit card', 'debit card', 'bank transfer')),
+	ean_code CHAR(13),
+	is_scanned BOOLEAN,
+	date_bought DATE,
+	cost INT,
+	PRIMARY KEY(ticket_id),
+    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
+	FOREIGN KEY(visitor_id) REFERENCES VISTORS(visitor_id)
+)
