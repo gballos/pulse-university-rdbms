@@ -1,11 +1,11 @@
+DROP SCHEMA IF EXISTS 'pulse_uni_db';
+CREATE SCHEMA 'pulse_uni_db';
+USE 'pulse_uni_db';
 
-CREATE DATABASE pulse_uni_db;
-USE pulse_uni_db;
-
+DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
-	location_id INT NOT NULL,
-    address_road VARCHAR(50),
-    address_number INT,   -- or store it as one / how to define format ?
+	location_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    address VARCHAR(50) CHECK(adress like '%, %'),   -- formatted as Street, Number?
     city VARCHAR(50),
     country VARCHAR(50),
     continent VARCHAR(50),
@@ -14,28 +14,31 @@ CREATE TABLE LOCATIONS (
     PRIMARY KEY(location_id)
 );
 
+DROP TABLE IF EXISTS FESTIVALS;
 CREATE TABLE FESTIVALS (
-	festival_id INT NOT NULL,
+	festival_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     date_starting DATE,
     date_ending DATE,
-    duration INT,  -- having duration in minytes?
-    location_id INT,
+    duration INT,  -- having duration in minutes?
+    location_id INT UNSIGNED,
     PRIMARY KEY(festival_id),
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id)
 );
 
+DROP TABLE IF EXISTS STAGES;
 CREATE TABLE STAGES (
-	stage_id INT NOT NULL,
+	stage_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     stage_name VARCHAR(50),
     stage_description VARCHAR(50),
     max_capacity INT,
     PRIMARY KEY(stage_id)
 );
 
+DROP TABLE IF EXISTS FESTIVAL_EVENTS;
 CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
-	event_id INT NOT NULL,
-    festival_id INT NOT NULL,
-    stage_id INT NOT NULL,
+	event_id INT USNIGNED NOT NULL AUTO_INCREMENT,
+    festival_id INT UNSIGNED NOT NULL,
+    stage_id INT  UNSIGNED NOT NULL,
     event_date DATE,
     duration INT,  -- again, in minutes?
     PRIMARY KEY(event_id),
@@ -43,16 +46,18 @@ CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
     FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
 );
 
+DROP TABLE IS EXISTS PERFORMANCE_TYPES;
 CREATE TABLE PERFORMANCE_TYPES (
-	performance_type_id	INT NOT NULL,
+	performance_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     performance_type VARCHAR(50),
     PRIMARY KEY(performance_type_id)
 );
 
+DROP TABLE IF EXISTS PERFORMANCES;
 CREATE TABLE PERFORMANCES (
-	performance_id INT NOT NULL,
-    performance_type_id INT NOT NULL,
-    event_id INT NOT NULL,
+	performance_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    performance_type_id INT UNSIGNED NOT NULL,
+    event_id INT UNSIGNED NOT NULL,
     performance_time TIME,
     duration INT,
     order_in_show INT,
@@ -77,11 +82,12 @@ CREATE TABLE LEVELS_OF_EXPERTISE (
     PRIMARY KEY(level_id)
 );
 
+DROP TABLE IF EXISTS STAFF;
 CREATE TABLE STAFF (
-	staff_id INT NOT NULL,
+	staff_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     staff_category_id INT NOT NULL,
     level_id INT NOT NULL,
-    event_id INT NOT NULL,
+    event_id INT UNSIGNED NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     age INT,
