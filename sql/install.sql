@@ -164,3 +164,18 @@ CREATE TABLE TICKETS(
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISTORS(visitor_id)
 );
+
+DROP TABLE IF EXISTS REVIEWS;
+CREATE TABLE REVIEWS(
+	review_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	visitor_id INT UNSIGNED NOT NULL,
+	performance_id INT UNSIGNED NOT NULL,
+	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
+	sound_lighting_rating INT CHECK(soun_lighting_rating BETWEEN 1 AND 5),
+    	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
+    	organization_rating INT CHECK(organization)rating BETWEEN 1 AND 5),
+    	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
+	PRIMARY KEY(review_id),
+	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
+	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id)
+);
