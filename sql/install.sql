@@ -26,3 +26,12 @@ CREATE TABLE FESTIVALS (
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
     CHECK (date_ending > date_starting) 
 );
+
+DROP TABLE IF EXISTS STAGES;
+CREATE TABLE STAGES (
+	stage_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    stage_name VARCHAR(50),
+    stage_description VARCHAR(50),
+    max_capacity INT,
+    PRIMARY KEY(stage_id)
+);
