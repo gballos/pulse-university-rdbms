@@ -34,6 +34,24 @@ CREATE TABLE STAGES (
     PRIMARY KEY(stage_id)
 );
 
+DROP TABLE IF EXISTS TECHNICAL_SUPPLY; 
+CREATE TABLE TECHNICAL_SUPPLY(
+	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	technical_supply_description VARCHAR(50),
+	current_supply UNSIGNED NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY(technical_supply_id)
+);
+
+DROP TABLE IF EXISTS STAGES_X_TECHNICAL_SUPPLY; --Many to many relationship
+CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
+	amount_of_supply INT UNSIGNED, 
+	stage_id INT UNSIGNED,
+	technical_supply_id INT UNSIGNED,
+	PRIMARY KEY(stage_id, band_id),
+	FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
+	FOREIGN KEY(technical_supply_id) REFERENCES TECHNICAL_SUPPLY(technical_supply_id)
+);
+
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
 CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
 	event_id INT USNIGNED NOT NULL AUTO_INCREMENT,
