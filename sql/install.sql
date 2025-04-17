@@ -203,7 +203,6 @@ CREATE TABLE BUYERS(
 	ticket_id INT UNSIGNED,
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id)
 );
 
@@ -215,6 +214,5 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
-	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type)
+	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
