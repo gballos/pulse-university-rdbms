@@ -49,7 +49,7 @@ CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
 	stage_id INT UNSIGNED,
 	technical_supply_id INT UNSIGNED,
 	PRIMARY KEY(stage_id, technical_supply_id),
-	FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
+	FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id),
 	FOREIGN KEY(technical_supply_id) REFERENCES TECHNICAL_SUPPLY(technical_supply_id)
 );
 
