@@ -34,6 +34,24 @@ CREATE TABLE STAGES (
     PRIMARY KEY(stage_id)
 );
 
+DROP TABLE IF EXISTS TECHNICAL_SUPPLY; 
+CREATE TABLE TECHNICAL_SUPPLY(
+	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	technical_supply_description VARCHAR(50),
+	current_supply UNSIGNED NOT NULL AUTO_INCREMENT,
+	PRIMARY KEY(technical_supply_id)
+);
+
+DROP TABLE IF EXISTS STAGES_X_TECHNICAL_SUPPLY; --Many to many relationship
+CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
+	amount_of_supply INT UNSIGNED, 
+	stage_id INT UNSIGNED,
+	technical_supply_id INT UNSIGNED,
+	PRIMARY KEY(stage_id, band_id),
+	FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
+	FOREIGN KEY(technical_supply_id) REFERENCES TECHNICAL_SUPPLY(technical_supply_id)
+);
+
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
 CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
 	event_id INT USNIGNED NOT NULL AUTO_INCREMENT,
@@ -73,7 +91,8 @@ CREATE TABLE ARTISTS(
 	PRIMARY KEY(artist_id),
 	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
 	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
-);
+);	
+
 
 DROP TABLE IF EXISTS BANDS;
 CREATE TABLE BANDS(
@@ -163,4 +182,53 @@ CREATE TABLE TICKETS(
 	PRIMARY KEY(ticket_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISTORS(visitor_id)
+);
+
+DROP TABLE IF EXISTS REVIEWS;
+CREATE TABLE REVIEWS( 
+	review_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	visitor_id INT UNSIGNED NOT NULL,
+	performance_id INT UNSIGNED NOT NULL,
+	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
+	sound_lighting_rating INT CHECK(soun_lighting_rating BETWEEN 1 AND 5),
+    	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
+    	organization_rating INT CHECK(organization)rating BETWEEN 1 AND 5),
+    	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
+	PRIMARY KEY(review_id),
+	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
+	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id)
+	CHECK( -- check ticket is scanned
+        	ticket_id IN (SELECT ticket_id FROM TICKETS WHERE is_scanned = TRUE)
+    	)
+);
+
+DROP TABLE IF EXISTS BUYERS;
+CREATE TABLE BUYERS( 
+	buyer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	event_id INT UNSIGNED,
+	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	ticket_id INT UNSIGNED,
+	PRIMARY KEY(buyer_id),
+	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
+	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type),
+	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id)
+	CHECK( -- check ticket is not scanned
+        	ticket_id IN (SELECT ticket_id FROM TICKETS WHERE is_scanned = FALSE)
+    	)
+);
+
+DROP TABLE IF EXISTS TICKETS_FOR_RESALE;
+CREATE TABLE TICKETS_FOR_RESALE(
+	ticket_for_resale_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	ticket_id INT UNSIGNED,
+	event_id INT UNSIGNED,
+	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	PRIMARY KEY(ticket_for_resale_id),
+	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
+	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
+	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type)
+	CHECK( -- check that seller has expressed "valid" interest
+        	ticket_id IS NOT NULL 
+        	OR (ticket_type IS NOT NULL AND event_id IS NOT NULL)
+    	)
 );
