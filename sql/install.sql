@@ -137,12 +137,7 @@ CREATE TABLE PERFORMANCES (
     performer_id INT UNSIGNED,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id)  REFERENCES PERFORMANCE_TYPES(performance_type_id),
-    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-    -- Ensuring performer_id exists in the referenced table
-    CONSTRAINT chk_performer CHECK (
-        (is_solo = 0 AND performer_id IN (SELECT artist_id FROM ARTISTS)) OR
-        (is_solo = 1 AND performer_id IN (SELECT band_id FROM BANDS)) 
-    )
+    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
 
 DROP TABLE IF EXISTS STAFF;
