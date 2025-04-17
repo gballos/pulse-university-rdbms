@@ -16,13 +16,14 @@ CREATE TABLE LOCATIONS (
 
 DROP TABLE IF EXISTS FESTIVALS;
 CREATE TABLE FESTIVALS (
-	festival_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    festival_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     date_starting DATE,
     date_ending DATE,
-    duration INT,  -- having duration in minutes?
+    duration INT,
     location_id INT UNSIGNED,
     PRIMARY KEY(festival_id),
-    FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id)
+    FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
+    CHECK (date_ending > date_starting) 
 );
 
 DROP TABLE IF EXISTS STAGES;
