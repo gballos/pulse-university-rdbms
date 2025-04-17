@@ -168,7 +168,7 @@ DROP TABLE IF EXISTS TICKETS;
 CREATE TABLE TICKETS(
 	ticket_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	event_id INT UNSIGNED,
-	vistor_id INT UNSIGNED,
+	visitor_id INT UNSIGNED,
 	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
 	payment_method VARCHAR(15) CHECK(payment_method in ('credit card', 'debit card', 'bank transfer')),
 	ean_code CHAR(13),
@@ -177,7 +177,7 @@ CREATE TABLE TICKETS(
 	cost INT,
 	PRIMARY KEY(ticket_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(visitor_id) REFERENCES VISTORS(visitor_id)
+	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id)
 );
 
 DROP TABLE IF EXISTS REVIEWS;
