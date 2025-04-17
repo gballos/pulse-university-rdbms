@@ -141,8 +141,9 @@ CREATE TABLE PERFORMANCES (
     -- Ensuring performer_id exists in the referenced table
     CONSTRAINT chk_performer CHECK (
         (is_solo = 0 AND performer_id IN (SELECT artist_id FROM ARTISTS)) OR
-        (is_solo = 1 AND performer_id IN (SELECT band_id FROM BANDS)) --No literal reference to artists/bands - Delete trigger needed
+        (is_solo = 1 AND performer_id IN (SELECT band_id FROM BANDS)) 
     )
+	--No literal reference to artists/bands - Delete trigger needed
 );
 
 DROP TABLE IF EXISTS STAFF;
