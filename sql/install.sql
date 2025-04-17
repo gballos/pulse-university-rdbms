@@ -48,7 +48,7 @@ CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
 	amount_of_supply INT UNSIGNED, 
 	stage_id INT UNSIGNED,
 	technical_supply_id INT UNSIGNED,
-	PRIMARY KEY(stage_id, band_id),
+	PRIMARY KEY(stage_id, technical_supply_id),
 	FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
 	FOREIGN KEY(technical_supply_id) REFERENCES TECHNICAL_SUPPLY(technical_supply_id)
 );
@@ -193,7 +193,7 @@ CREATE TABLE REVIEWS(
 	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
 	sound_lighting_rating INT CHECK(soun_lighting_rating BETWEEN 1 AND 5),
     	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
-    	organization_rating INT CHECK(organization)rating BETWEEN 1 AND 5),
+    	organization_rating INT CHECK(organization_rating BETWEEN 1 AND 5),
     	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
 	PRIMARY KEY(review_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
