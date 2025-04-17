@@ -55,9 +55,9 @@ CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
 
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
 CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
-	event_id INT USNIGNED NOT NULL AUTO_INCREMENT,
+	event_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	festival_id INT UNSIGNED NOT NULL,
-    stage_id INT  UNSIGNED NOT NULL,
+    stage_id INT UNSIGNED NOT NULL,
     event_date DATE,
     duration INT,  -- again, in minutes?
     PRIMARY KEY(event_id),
@@ -114,7 +114,7 @@ CREATE TABLE ARTISTS_X_BANDS(
 	artist_id INT UNSIGNED,
 	band_id INT UNSIGNED,
 	PRIMARY KEY(artist_id, band_id),
-	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id)
+	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id),
 	FOREIGN KEY(band_id) REFERENCES BANDS(band_id)
 );
 	
@@ -137,7 +137,7 @@ CREATE TABLE PERFORMANCES (
     performer_id INT UNSIGNED,
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id)  REFERENCES PERFORMANCE_TYPES(performance_type_id),
-    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
+    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
     -- Ensuring performer_id exists in the referenced table
     CONSTRAINT chk_performer CHECK (
         (is_solo = 0 AND performer_id IN (SELECT artist_id FROM ARTISTS)) OR
@@ -148,7 +148,7 @@ CREATE TABLE PERFORMANCES (
 DROP TABLE IF EXISTS STAFF;
 CREATE TABLE STAFF (
 	staff_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_category VARCHAR(15) CHECK(staff_category in ('technical', 'security', 'general')).
+    staff_category VARCHAR(15) CHECK(staff_category in ('technical', 'security', 'general')),
     level_of_expertise VARCHAR(10) CHECK(level_of_expertise in ('trainee', 'junior', 'mid', 'senior', 'manager')),
     event_id INT UNSIGNED NOT NULL,
     first_name VARCHAR(50),
@@ -192,12 +192,12 @@ CREATE TABLE REVIEWS(
 	performance_id INT UNSIGNED NOT NULL,
 	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
 	sound_lighting_rating INT CHECK(soun_lighting_rating BETWEEN 1 AND 5),
-    	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
-    	organization_rating INT CHECK(organization_rating BETWEEN 1 AND 5),
-    	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
+	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
+	organization_rating INT CHECK(organization_rating BETWEEN 1 AND 5),
+	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
 	PRIMARY KEY(review_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
-	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id)
+	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id),
 	CHECK( -- check ticket is scanned
         	ticket_id IN (SELECT ticket_id FROM TICKETS WHERE is_scanned = TRUE)
     	)
@@ -212,7 +212,7 @@ CREATE TABLE BUYERS(
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type),
-	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id)
+	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
 	CHECK( -- check ticket is not scanned
         	ticket_id IN (SELECT ticket_id FROM TICKETS WHERE is_scanned = FALSE)
     	)
@@ -227,7 +227,7 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type)
+	FOREIGN KEY(ticket_type) REFERENCES TICKETS(ticket_type),
 	CHECK( -- check that seller has expressed "valid" interest
         	ticket_id IS NOT NULL 
         	OR (ticket_type IS NOT NULL AND event_id IS NOT NULL)
