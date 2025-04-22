@@ -164,20 +164,36 @@ CREATE TABLE VISITORS(
 	PRIMARY KEY(visitor_id)
 );
 
+DROP TABLE IF EXISTS TICKET_TYPES;
+CREATE TABLE TICKET_TYPES(
+	ticket_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	ticket_type VARCHAR(25),
+	PRIMARY KEY(ticket_type_id)
+);
+
+DROP TABLE IF EXISTS PAYMENT_METHODS;
+CREATE TABLE PAYMENT_METHODS(
+	payment_method_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	payment_method VARCHAR(50),
+	PRIMARY KEY(payment_method_id)
+);
+
 DROP TABLE IF EXISTS TICKETS;
 CREATE TABLE TICKETS(
 	ticket_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	event_id INT UNSIGNED,
 	visitor_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
-	payment_method VARCHAR(15) CHECK(payment_method in ('credit card', 'debit card', 'bank transfer')),
+	ticket_type_id INT UNSIGNED,
+	payment_method_id INT UNSIGNED,
 	ean_code CHAR(13),
 	is_scanned BOOLEAN,
 	date_bought DATE,
 	cost INT,
 	PRIMARY KEY(ticket_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id)
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
+	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
+	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id),
 );
 
 DROP TABLE IF EXISTS REVIEWS;
@@ -199,11 +215,12 @@ DROP TABLE IF EXISTS BUYERS;
 CREATE TABLE BUYERS( 
 	buyer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	event_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	ticket_type_id INT UNSIGNED,
 	ticket_id INT UNSIGNED,
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id)
+	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 );
 
 DROP TABLE IF EXISTS TICKETS_FOR_RESALE;
@@ -211,8 +228,9 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	ticket_for_resale_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	ticket_id INT UNSIGNED,
 	event_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	ticket_type_id INT UNSIGNED,
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
