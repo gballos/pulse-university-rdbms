@@ -212,19 +212,32 @@ CREATE TABLE TICKETS(
 	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id),
 );
 
+DROP TABLE IF EXISTS LIKERT_RATINGS;
+CREATE TABLE LIKERT_RATINGS(
+	rating_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	rating_number INT UNSIGNED CHECK (rating_number BETWEEN 1 AND 5),
+	rating_description VARCHAR(25),
+	PRIMARY KEY(rating_id)
+);
+
 DROP TABLE IF EXISTS REVIEWS;
 CREATE TABLE REVIEWS( 
 	review_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	visitor_id INT UNSIGNED NOT NULL,
 	performance_id INT UNSIGNED NOT NULL,
-	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
-	sound_lighting_rating INT CHECK(sound_lighting_rating BETWEEN 1 AND 5),
-	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
-	organization_rating INT CHECK(organization_rating BETWEEN 1 AND 5),
-	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
+	interpretation_rating INT UNSIGNED,
+	sound_lighting_rating INT UNSIGNED,
+	stage_presence_rating INT UNSIGNED,
+	organization_rating INT UNSIGNED,
+	overall_impression_rating INT UNSIGNED,
 	PRIMARY KEY(review_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
-	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id)
+	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id),
+	FOREIGN KEY(interpretation_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(sound_lighting_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(stage_presence_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(organization_rating) REFERENCES LIKERT_RATINGS(rating_id),	
+	FOREIGN KEY(overall_impression_rating) REFERENCES LIKERT_RATINGS(rating_id),	
 );
 
 DROP TABLE IF EXISTS BUYERS;
