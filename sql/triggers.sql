@@ -13,7 +13,6 @@ END;
 //
 
 DROP TRIGGER IF EXISTS delete_performance_after_band;
-DELIMITER //
 CREATE TRIGGER delete_performance_after_band
 AFTER DELETE ON BANDS
 FOR EACH ROW
@@ -25,7 +24,6 @@ END;
 
 -- Resale queue
 DROP TRIGGER IF EXISTS resale_queue;
-DELIMITER //
 CREATE TRIGGER resale_queue
 AFTER INSERT ON TICKETS_FOR_RESALE
 FOR EACH ROW
@@ -52,7 +50,6 @@ END;
 
 -- Check review eligibility
 DROP TRIGGER IF EXISTS check_review_ticket_scanned;
-DELIMITER //
 
 CREATE TRIGGER check_review_ticket_scanned
 BEFORE INSERT ON REVIEWS
@@ -80,7 +77,7 @@ BEGIN
     END IF;
 END;
 //
-
+DELIMITER ;
 
 
 
