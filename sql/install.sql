@@ -131,7 +131,7 @@ CREATE TABLE PERFORMANCES (
     performance_type_id INT UNSIGNED NOT NULL,
     event_id INT UNSIGNED NOT NULL,
     performance_time TIME,
-    duration INT,
+    duration INT CHECK(duration <= 3),
     order_in_show INT,
     is_solo BOOLEAN,
     performer_id INT UNSIGNED,

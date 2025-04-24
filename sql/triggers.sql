@@ -77,6 +77,30 @@ BEGIN
     END IF;
 END;
 //
+-- Performer ID Trigger
+DROP TRIGGER IF EXISTS check_performer;
+CREATE TRIGGER check_performer
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+   DECLARE artist_count INT;
+   DECLARE band_count INT;
+
+   IF NEW.is_solo = TRUE THEN
+       SELECT COUNT(*) INTO artist_count FROM ARTISTS WHERE artist_id = NEW.performer_id;
+       IF artist_count = 0 THEN
+           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching artist for solo performance.';
+       END IF;
+   ELSE
+       SELECT COUNT(*) INTO band_count FROM BANDS WHERE band_id = NEW.performer_id;
+       IF band_count = 0 THEN
+           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching band for ensemble performance.';
+       END IF;
+   END IF;
+END //
+
+
+
 DELIMITER ;
 
 
