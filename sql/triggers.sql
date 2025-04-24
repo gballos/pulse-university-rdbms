@@ -112,7 +112,7 @@ BEGIN
     FROM FESTIVAL_EVENTS
     WHERE event_id = NEW.event_id;
 
-    -- Count how many times this performer performed in the 2 years before this one
+    -- Count how many times this performer performed in the 3 years before this one
     IF NEW.is_solo = TRUE THEN
         SELECT COUNT(DISTINCT YEAR(fe.event_date)) INTO prev_years
         FROM PERFORMANCES p
@@ -135,7 +135,37 @@ BEGIN
     END IF;
 END//
 
+CREATE TRIGGER check_stage_capacity
+BEFORE INSERT ON TICKETS
+FOR EACH ROW
+BEGIN
+    DECLARE cap INT;
+    DECLARE ticket_count INT;
+    DECLARE vip_count INT;
 
+    SELECT s.max_capacity INTO cap
+    FROM FESTIVAL_EVENTS fe
+    JOIN STAGES s ON s.stage_id = fe.event_id
+    WHERE NEW.event_id = fe.event_id;
+
+    SELECT COUNT(*) INTO ticket_count
+    FROM TICKETS
+    WHERE event_id = NEW.event_id;
+
+    SELECT COUNT(*) INTO ticket_count
+    FROM TICKETS
+    WHERE event_id = NEW.event_id AND ticket_type = 'VIP';
+
+    IF ticket_count >= cap THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Exceeded stage capacity. No more tickets available.';
+    END IF;
+
+    IF vip_count >= 0.1*cap THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No more VIP tickets available';
+    END IF;
+END //
 
 DELIMITER ;
 
