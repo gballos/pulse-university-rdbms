@@ -99,6 +99,42 @@ BEGIN
    END IF;
 END //
 
+DROP TRIGGER IF EXISTS check_4th_year;
+CREATE TRIGGER check_4th_year
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+    DECLARE performer_year INT;
+    DECLARE prev_years INT;
+
+    -- Get the year of the current performance
+    SELECT YEAR(event_date) INTO performer_year
+    FROM FESTIVAL_EVENTS
+    WHERE event_id = NEW.event_id;
+
+    -- Count how many times this performer performed in the 2 years before this one
+    IF NEW.is_solo = TRUE THEN
+        SELECT COUNT(DISTINCT YEAR(fe.event_date)) INTO prev_years
+        FROM PERFORMANCES p
+        JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
+        WHERE p.performer_id = NEW.performer_id
+          AND p.is_solo = 1
+          AND YEAR(fe.event_date) BETWEEN performer_year - 3 AND performer_year - 1;
+    ELSE
+        SELECT COUNT(DISTINCT YEAR(fe.event_date)) INTO prev_years
+        FROM PERFORMANCES p
+        JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
+        WHERE p.performer_id = NEW.performer_id
+          AND p.is_solo = 0
+          AND YEAR(fe.event_date) BETWEEN performer_year - 3 AND performer_year - 1;
+    END IF;
+
+    IF prev_years = 3 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Performer cannot take part in the festival for more than 3 consecutive years.';
+    END IF;
+END//
+
 
 
 DELIMITER ;
