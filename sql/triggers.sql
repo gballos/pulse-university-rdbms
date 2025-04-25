@@ -152,7 +152,7 @@ BEGIN
     FROM TICKETS
     WHERE event_id = NEW.event_id;
 
-    SELECT COUNT(*) INTO ticket_count
+    SELECT COUNT(*) INTO vip_count
     FROM TICKETS
     WHERE event_id = NEW.event_id AND ticket_type = 'VIP';
 
