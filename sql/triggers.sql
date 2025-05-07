@@ -142,6 +142,11 @@ BEGIN
     DECLARE cap INT;
     DECLARE ticket_count INT;
     DECLARE vip_count INT;
+    DECLARE ticket_type_name VARCHAR(20);
+
+    SELECT name INTO ticket_type_name
+    FROM TICKET_TYPES
+    WHERE ticket_type_id = NEW.ticket_type_id;
 
     SELECT s.max_capacity INTO cap
     FROM FESTIVAL_EVENTS fe
