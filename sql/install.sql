@@ -42,7 +42,6 @@ DROP TABLE IF EXISTS TECHNICAL_SUPPLY;
 CREATE TABLE TECHNICAL_SUPPLY(
 	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	technical_supply_description VARCHAR(50),
-	current_supply INT UNSIGNED NOT NULL,
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(technical_supply_id)
 );
