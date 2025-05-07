@@ -142,7 +142,7 @@ CREATE TABLE PERFORMANCES (
 DROP TABLE IF EXISTS TECHNICAL_ROLES;
 CREATE TABLE TECHNICAL_ROLES(
 	technical_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	technical_decsription VARCHAR(40),
+	technical_description VARCHAR(40),
 	PRIMARY KEY(technical_id)
 );
 
@@ -245,7 +245,7 @@ CREATE TABLE REVIEWS(
 	FOREIGN KEY(sound_lighting_rating) REFERENCES LIKERT_RATINGS(rating_id),
 	FOREIGN KEY(stage_presence_rating) REFERENCES LIKERT_RATINGS(rating_id),
 	FOREIGN KEY(organization_rating) REFERENCES LIKERT_RATINGS(rating_id),	
-	FOREIGN KEY(overall_impression_rating) REFERENCES LIKERT_RATINGS(rating_id),	
+	FOREIGN KEY(overall_impression_rating) REFERENCES LIKERT_RATINGS(rating_id)
 );
 
 DROP TABLE IF EXISTS BUYERS;
@@ -257,7 +257,7 @@ CREATE TABLE BUYERS(
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
-	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id)
 );
 
 DROP TABLE IF EXISTS TICKETS_FOR_RESALE;
