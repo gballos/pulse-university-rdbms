@@ -28,23 +28,23 @@ CREATE TRIGGER resale_queue
 AFTER INSERT ON TICKETS_FOR_RESALE
 FOR EACH ROW
 BEGIN
-  DECLARE matched_buyer_id INT;
-  DECLARE matched_resale_id INT;
+    DECLARE matched_buyer_id INT;
+    DECLARE matched_resale_id INT;
 
-  -- Find first buyer requesting this ticket or a matching one
-  SELECT buyer_id INTO matched_buyer_id
-  FROM BUYERS
-  WHERE ticket_id = NEW.ticket_id
-     OR (BUYERS.ticket_type = NEW.ticket_type AND BUYERS.event_id = NEW.event_id)
-  ORDER BY buyer_id
-  LIMIT 1;
+    -- Find first buyer requesting this ticket or a matching one
+    SELECT buyer_id INTO matched_buyer_id
+    FROM BUYERS
+    WHERE ticket_id = NEW.ticket_id
+     OR (BUYERS.ticket_type_id = NEW.ticket_type_id AND BUYERS.event_id = NEW.event_id)
+    ORDER BY buyer_id
+    LIMIT 1;
 
-  SET matched_resale_id = NEW.ticket_for_resale_id;
+    SET matched_resale_id = NEW.ticket_for_resale_id;
 
-  IF matched_buyer_id IS NOT NULL THEN
+    IF matched_buyer_id IS NOT NULL THEN
     DELETE FROM BUYERS WHERE buyer_id = matched_buyer_id;
     DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = matched_resale_id;
-  END IF;
+    END IF;
 END;
 //
 
@@ -144,7 +144,7 @@ BEGIN
     DECLARE vip_count INT;
     DECLARE ticket_type_name VARCHAR(20);
 
-    SELECT name INTO ticket_type_name
+    SELECT ticket_type INTO ticket_type_name
     FROM TICKET_TYPES
     WHERE ticket_type_id = NEW.ticket_type_id;
 
@@ -159,7 +159,7 @@ BEGIN
 
     SELECT COUNT(*) INTO vip_count
     FROM TICKETS
-    WHERE event_id = NEW.event_id AND ticket_type = 'VIP';
+    WHERE event_id = NEW.event_id AND ticket_type_name = 'VIP';
 
     IF ticket_count >= cap THEN
         SIGNAL SQLSTATE '45000'
