@@ -94,7 +94,6 @@ CREATE TABLE ARTISTS(
 	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
 );	
 
-
 DROP TABLE IF EXISTS BANDS;
 CREATE TABLE BANDS(
 	band_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -117,7 +116,7 @@ CREATE TABLE ARTISTS_X_BANDS(
 	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id),
 	FOREIGN KEY(band_id) REFERENCES BANDS(band_id)
 );
-	
+
 DROP TABLE IF EXISTS PERFORMANCE_TYPES;
 CREATE TABLE PERFORMANCE_TYPES (
 	performance_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -131,7 +130,7 @@ CREATE TABLE PERFORMANCES (
     performance_type_id INT UNSIGNED NOT NULL,
     event_id INT UNSIGNED NOT NULL,
     performance_time TIME,
-    duration INT,
+    duration INT CHECK(duration <= 180), -- duration in minutes
     order_in_show INT,
     is_solo BOOLEAN,
     performer_id INT UNSIGNED,
