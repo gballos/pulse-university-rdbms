@@ -5,7 +5,7 @@ USE pulse_uni_db;
 DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
 	location_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    address VARCHAR(50), CHECK(address like '%, %'),   -- formatted as Street, Number?
+    address VARCHAR(50),
     city VARCHAR(50),
     country VARCHAR(50),
     continent VARCHAR(50),

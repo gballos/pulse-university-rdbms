@@ -172,6 +172,29 @@ BEGIN
     END IF;
 END //
 
+DROP VIEW IF EXISTS staff_coverage_view;
+CREATE VIEW staff_coverage_view AS
+
+SELECT
+  fe.event_id,
+  fe.stage_id,
+  s.max_capacity,
+
+  SUM(CASE WHEN sc.staff_category_desc = 'technical' THEN 1 ELSE 0 END) AS technical_assigned,
+  SUM(CASE WHEN sc.staff_category_desc = 'security' THEN 1 ELSE 0 END) AS security_assigned,
+  SUM(CASE WHEN sc.staff_category_desc = 'general' THEN 1 ELSE 0 END) AS general_assigned,
+
+
+  CEIL(s.max_capacity * 0.05) AS security_required,
+  CEIL(s.max_capacity * 0.02) AS general_required
+
+FROM FESTIVAL_EVENTS fe
+JOIN STAGES s ON fe.stage_id = s.stage_id
+LEFT JOIN STAFF st ON st.event_id = fe.event_id  -- Left join because we need to see the event even if it has no staff
+LEFT JOIN STAFF_CATEGORIES sc ON st.category_id = sc.staff_category_id
+
+GROUP BY fe.event_id, fe.stage_id, s.max_capacity;
+
 DELIMITER ;
 
 
