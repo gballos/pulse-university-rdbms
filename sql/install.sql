@@ -11,6 +11,7 @@ CREATE TABLE LOCATIONS (
     continent VARCHAR(50),
     longtitude NUMERIC(5, 2),
     latitude NUMERIC(5, 2),
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(location_id)
 );
 
@@ -21,6 +22,7 @@ CREATE TABLE FESTIVALS (
     date_ending DATE,
     duration INT,
     location_id INT UNSIGNED,
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(festival_id),
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
     CHECK (date_ending > date_starting) 
@@ -32,6 +34,7 @@ CREATE TABLE STAGES (
     stage_name VARCHAR(50),
     stage_description VARCHAR(50),
     max_capacity INT,
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(stage_id)
 );
 
@@ -40,6 +43,7 @@ CREATE TABLE TECHNICAL_SUPPLY(
 	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	technical_supply_description VARCHAR(50),
 	current_supply INT UNSIGNED NOT NULL,
+    image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(technical_supply_id)
 );
 
@@ -60,6 +64,7 @@ CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
     stage_id INT UNSIGNED NOT NULL,
     event_date DATE,
     duration INT,  -- again, in minutes?
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_id) REFERENCES FESTIVALS(festival_id),
     FOREIGN KEY(stage_id) REFERENCES STAGES(stage_id)
@@ -89,6 +94,7 @@ CREATE TABLE ARTISTS(
 	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website like 'https://%'),
 	instagram VARCHAR(50),
+    image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(artist_id),
 	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
 	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
@@ -103,6 +109,7 @@ CREATE TABLE BANDS(
 	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website like 'https://%'),
 	instagram VARCHAR(50),
+    image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(band_id),
 	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
 	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
@@ -134,6 +141,7 @@ CREATE TABLE PERFORMANCES (
     order_in_show INT,
     is_solo BOOLEAN,
     performer_id INT UNSIGNED,
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(performance_id),
     FOREIGN KEY(performance_type_id)  REFERENCES PERFORMANCE_TYPES(performance_type_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
@@ -171,6 +179,7 @@ CREATE TABLE STAFF (
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     age INT,
+    image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(staff_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(category_id) REFERENCES STAFF_CATEGORIES(staff_category_id),
