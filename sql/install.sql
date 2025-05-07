@@ -139,17 +139,42 @@ CREATE TABLE PERFORMANCES (
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
 
+DROP TABLE IF EXISTS TECHNICAL_ROLES;
+CREATE TABLE TECHNICAL_ROLES(
+	technical_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	technical_decsription VARCHAR(40),
+	PRIMARY KEY(technical_id)
+);
+
+DROP TABLE IF EXISTS STAFF_CATEGORIES;
+CREATE TABLE STAFF_CATEGORIES(
+	staff_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	staff_category_desc VARCHAR(20),
+	technical_id INT UNSIGNED DEFAULT NULL, -- for the employees that are technical, can be null for security/assistance
+	PRIMARY KEY(staff_category_id),
+	FOREIGN KEY(technical_id) REFERENCES TECHNICAL_ROLES(technical_id)
+);
+
+DROP TABLE IF EXISTS LEVELS_OF_EXPERTISE;
+CREATE TABLE LEVELS_OF_EXPERTISE(
+	level_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	level_description VARCHAR(20),
+	PRIMARY KEY(level_id)
+);
+
 DROP TABLE IF EXISTS STAFF;
 CREATE TABLE STAFF (
 	staff_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    staff_category VARCHAR(15) CHECK(staff_category in ('technical', 'security', 'general')),
-    level_of_expertise VARCHAR(10) CHECK(level_of_expertise in ('trainee', 'junior', 'mid', 'senior', 'manager')),
+    category_id INT UNSIGNED,
+    level_id INT UNSIGNED,
     event_id INT UNSIGNED NOT NULL,
     first_name VARCHAR(50),
     last_name VARCHAR(50),
     age INT,
     PRIMARY KEY(staff_id),
-    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
+    FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
+	FOREIGN KEY(category_id) REFERENCES STAFF_CATEGORIES(staff_category_id),
+	FOREIGN KEY(level_id) REFERENCES LEVELS_OF_EXPERTISE(level_id)
 ); 
 
 DROP TABLE IF EXISTS VISITORS;
@@ -163,20 +188,44 @@ CREATE TABLE VISITORS(
 	PRIMARY KEY(visitor_id)
 );
 
+DROP TABLE IF EXISTS TICKET_TYPES;
+CREATE TABLE TICKET_TYPES(
+	ticket_type_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	ticket_type VARCHAR(25),
+	PRIMARY KEY(ticket_type_id)
+);
+
+DROP TABLE IF EXISTS PAYMENT_METHODS;
+CREATE TABLE PAYMENT_METHODS(
+	payment_method_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	payment_method VARCHAR(50),
+	PRIMARY KEY(payment_method_id)
+);
+
 DROP TABLE IF EXISTS TICKETS;
 CREATE TABLE TICKETS(
 	ticket_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	event_id INT UNSIGNED,
 	visitor_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
-	payment_method VARCHAR(15) CHECK(payment_method in ('credit card', 'debit card', 'bank transfer')),
+	ticket_type_id INT UNSIGNED,
+	payment_method_id INT UNSIGNED,
 	ean_code CHAR(13),
 	is_scanned BOOLEAN,
 	date_bought DATE,
 	cost INT,
 	PRIMARY KEY(ticket_id),
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id)
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
+	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
+	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id)
+);
+
+DROP TABLE IF EXISTS LIKERT_RATINGS;
+CREATE TABLE LIKERT_RATINGS(
+	rating_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+	rating_number INT UNSIGNED CHECK (rating_number BETWEEN 1 AND 5),
+	rating_description VARCHAR(25),
+	PRIMARY KEY(rating_id)
 );
 
 DROP TABLE IF EXISTS REVIEWS;
@@ -184,25 +233,31 @@ CREATE TABLE REVIEWS(
 	review_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	visitor_id INT UNSIGNED NOT NULL,
 	performance_id INT UNSIGNED NOT NULL,
-	interpretation_rating INT CHECK(interpretation_rating BETWEEN 1 AND 5),
-	sound_lighting_rating INT CHECK(sound_lighting_rating BETWEEN 1 AND 5),
-	stage_presence_rating INT CHECK(stage_presence_rating BETWEEN 1 AND 5),
-	organization_rating INT CHECK(organization_rating BETWEEN 1 AND 5),
-	overall_impression_rating INT CHECK(overall_impression_rating BETWEEN 1 AND 5),
+	interpretation_rating INT UNSIGNED,
+	sound_lighting_rating INT UNSIGNED,
+	stage_presence_rating INT UNSIGNED,
+	organization_rating INT UNSIGNED,
+	overall_impression_rating INT UNSIGNED,
 	PRIMARY KEY(review_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
-	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id)
+	FOREIGN KEY(performance_id) REFERENCES PERFORMANCES(performance_id),
+	FOREIGN KEY(interpretation_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(sound_lighting_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(stage_presence_rating) REFERENCES LIKERT_RATINGS(rating_id),
+	FOREIGN KEY(organization_rating) REFERENCES LIKERT_RATINGS(rating_id),	
+	FOREIGN KEY(overall_impression_rating) REFERENCES LIKERT_RATINGS(rating_id),	
 );
 
 DROP TABLE IF EXISTS BUYERS;
 CREATE TABLE BUYERS( 
 	buyer_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	event_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	ticket_type_id INT UNSIGNED,
 	ticket_id INT UNSIGNED,
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
-	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id)
+	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 );
 
 DROP TABLE IF EXISTS TICKETS_FOR_RESALE;
@@ -210,8 +265,9 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	ticket_for_resale_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	ticket_id INT UNSIGNED,
 	event_id INT UNSIGNED,
-	ticket_type VARCHAR(15) CHECK(ticket_type in ('regular', 'VIP', 'backstage')),
+	ticket_type_id INT UNSIGNED,
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
+	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
