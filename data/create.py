@@ -376,3 +376,20 @@ def fake_staff_categories(f):
     for desc, tech_id in technical_categories + non_technical_categories:
         f.write(build_staff_category(category_id, desc, tech_id))
         category_id += 1
+
+
+# LEVELS_OF_EXPERTISE
+def fake_levels_of_expertise(f):
+    levels = [
+        "Intern",
+        "Beginner",
+        "Intermediate",
+        "Experienced",
+        "Expert"
+    ]
+
+    def build_level(description):
+        return f"INSERT INTO LEVELS_OF_EXPERTISE (level_description) VALUES ('{description}');\n"
+
+    for description in levels:
+        f.write(build_level(description))
