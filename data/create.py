@@ -260,6 +260,7 @@ def fake_bands(f):
     for band in bands:
         f.write(band)
 
+
 # ARTISTS_X_BANDS
 def fake_artists_x_bands(f):
     pairs = set()
@@ -274,3 +275,19 @@ def fake_artists_x_bands(f):
 
     for artist_id, band_id in pairs:
         f.write(build_artist_band_link(artist_id, band_id))
+
+
+# PERFORMANCE_TYPES
+def fake_performance_types(f):
+    performance_types = [
+        "Solo Performance", "Band Performance", "DJ Set",
+        "Orchestral", "Acoustic Session", "Live Jam",
+        "Tribute Act", "Street Performance", "Unplugged",
+        "Multimedia Show"
+    ]
+
+    def build_performance_type(performance_type):
+        return f"INSERT INTO PERFORMANCE_TYPES (performance_type) VALUES ('{performance_type}');\n"
+
+    for performance_type in performance_types:
+        f.write(build_performance_type(performance_type))
