@@ -481,3 +481,34 @@ def fake_payment_methods(f):
 
     for method in payment_methods:
         f.write(build_payment_method(method))
+
+
+# TICKETS
+def fake_tickets(f):
+    fake = faker.Faker()
+
+    def build_ticket(ticket_id):
+        event_id = random.randint(1, N_EVENTS)
+        visitor_id = random.randint(1, N_VISITORS)
+        ticket_type_id = random.randint(1, 3)
+        payment_method_id = random.randint(1, 7)
+        ean_code = ''.join(str(random.randint(0, 9)) for _ in range(13))
+        is_scanned = random.choice([0, 1])
+        date_bought = fake.date_between(start_date='-1y', end_date='today')
+        cost = random.randint(20, 200)
+
+        return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{
+            ticket_id}', '{
+            event_id}', '{
+            visitor_id}', '{
+            ticket_type_id}', '{
+            payment_method_id}', '{
+            ean_code}', '{
+            is_scanned}', '{
+            date_bought}', '{
+            cost}');\n"
+
+    tickets = (build_ticket(i) for i in range(1, N_TICKETS + 1))
+
+    for ticket in tickets:
+        f.write(ticket)
