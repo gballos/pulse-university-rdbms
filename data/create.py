@@ -119,3 +119,19 @@ def fake_technical_supplies(f):
 
     for stage in stages:
         f.write(stage)
+
+
+#STAGES_X_TECHNICAL_SUPPLY
+def fake_stages_x_technical_supply(f):
+    links = set()
+
+    while len(links) < 100:  # adjust number of links
+        stage_id = random.randint(1, N_STAGES)
+        tech_id = random.randint(1, N_TECHNICAL_SUPPLIES)
+        links.add((stage_id, tech_id))
+
+    def build_link(stage_id, tech_id):
+        return f"INSERT INTO STAGES_X_TECHNICAL_SUPPLY (stage_id, technical_supply_id) VALUES ('{stage_id}', '{tech_id}');\n"
+
+    for stage_id, tech_id in links:
+        f.write(build_link(stage_id, tech_id))
