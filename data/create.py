@@ -447,3 +447,18 @@ def fake_visitors(f):
 
     for visitor in visitors:
         f.write(visitor)
+
+
+# TICKET_TYPES
+def fake_ticket_types(f):
+    ticket_types = [
+        "General Admission",
+        "VIP",
+        "Backstage",
+    ]
+
+    def build_ticket_type(ticket_type):
+        return f"INSERT INTO TICKET_TYPES (ticket_type) VALUES ('{ticket_type}');\n"
+
+    for ticket_type in ticket_types:
+        f.write(build_ticket_type(ticket_type))
