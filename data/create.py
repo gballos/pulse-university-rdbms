@@ -594,3 +594,31 @@ def fake_tickets_for_resale(f):
 
     for resale_ticket in resale_tickets:
         f.write(resale_ticket)
+
+
+with open("load.sql", "w") as f:
+    fake_locations(f)
+    fake_festivals(f)
+    fake_stages(f)
+    fake_technical_supplies(f)
+    fake_music_types(f)
+    fake_music_subtypes(f)
+    fake_artists(f)
+    fake_bands(f)
+    fake_artists_x_bands(f)
+    fake_performance_types(f)
+    fake_festival_events(f)
+    fake_performances(f)
+    fake_technical_roles(f)
+    fake_staff_categories(f)
+    fake_levels_of_expertise(f)
+    fake_staff(f)
+    fake_visitors(f)
+    fake_ticket_types(f)
+    fake_payment_methods(f)
+    fake_tickets(f)
+    fake_likert_ratings(f)
+    fake_reviews(f)
+    fake_buyers(f)
+    fake_tickets_for_resale(f)
+    fake_stages_x_technical_supply(f)
