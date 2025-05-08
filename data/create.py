@@ -121,7 +121,7 @@ def fake_technical_supplies(f):
         f.write(stage)
 
 
-#STAGES_X_TECHNICAL_SUPPLY
+# STAGES_X_TECHNICAL_SUPPLY
 def fake_stages_x_technical_supply(f):
     links = set()
 
@@ -135,3 +135,27 @@ def fake_stages_x_technical_supply(f):
 
     for stage_id, tech_id in links:
         f.write(build_link(stage_id, tech_id))
+
+
+# FESTIVAL_EVENTS
+def fake_festival_events(f):
+    fake = faker.Faker()
+
+    def build_festivaL_events(event_id):
+        festival_id = random.randint(1, N_FESTIVALS)
+        stage_id = random.randint(1, N_STAGES) 
+        event_date = fake.date()
+        duration = random.randint(60, 180)
+        image = fake.image_url()
+        return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{
+            event_id}', '{
+            festival_id}', '{
+            stage_id}', '{
+            event_date}', '{
+            duration}', '{
+            image}');\n"
+
+    festival_events = (build_festivaL_events(_) for _ in range(1, N_EVENTS+1)) 
+
+    for festival_event in festival_events:
+        f.write(festival_event)
