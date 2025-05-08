@@ -159,3 +159,22 @@ def fake_festival_events(f):
 
     for festival_event in festival_events:
         f.write(festival_event)
+
+
+# MUSIC_TYPES
+def fake_music_types(f):
+    music_types = [
+        "Rock", "Pop", "Hip Hop", "Jazz", "Classical",
+        "Electronic", "Country", "Reggae", "Blues", "Metal"
+    ]
+
+    def build_music_type(music_type_id, music_type):
+        return f"INSERT INTO MUSIC_TYPES (music_type_id, music_type) VALUES ('{music_type_id}', '{music_type}');\n"
+
+    music_type_statements = (
+        build_music_type(i, music_type)
+        for i, music_type in enumerate(music_types, start=1)
+    )
+
+    for music_type_stmt in music_type_statements:
+        f.write(music_type_stmt)
