@@ -393,3 +393,32 @@ def fake_levels_of_expertise(f):
 
     for description in levels:
         f.write(build_level(description))
+
+
+# STAFF
+def fake_staff(f):
+    fake = faker.Faker()
+
+    def build_staff(staff_id):
+        category_id = random.randint(1, 13)
+        level_id = random.randint(1, 5)
+        event_id = random.randint(1, N_EVENTS)
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        age = random.randint(18, 65)
+        image = fake.image_url()
+
+        return f"INSERT INTO STAFF (staff_id, category_id, level_id, event_id, first_name, last_name, age, image) VALUES ('{
+            staff_id}', '{
+            category_id}', '{
+            level_id}', '{
+            event_id}', '{
+            first_name}', '{
+            last_name}', '{
+            age}', '{
+            image}');\n"
+
+    staff_members = (build_staff(i) for i in range(1, N_STAFF + 1))
+
+    for staff in staff_members:
+        f.write(staff)
