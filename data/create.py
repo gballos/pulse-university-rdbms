@@ -462,3 +462,22 @@ def fake_ticket_types(f):
 
     for ticket_type in ticket_types:
         f.write(build_ticket_type(ticket_type))
+
+
+# PAYMENT_METHODS
+def fake_payment_methods(f):
+    payment_methods = [
+        "Credit Card",
+        "Debit Card",
+        "Bank Transfer",
+        "Mobile Wallet",
+        "Online Banking",
+        "Prepaid Card",
+        "Cash"
+    ]
+
+    def build_payment_method(method):
+        return f"INSERT INTO PAYMENT_METHODS (payment_method) VALUES ('{method}');\n"
+
+    for method in payment_methods:
+        f.write(build_payment_method(method))
