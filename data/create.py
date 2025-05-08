@@ -345,3 +345,34 @@ def fake_technical_roles(f):
 
     for description in technical_descriptions:
         f.write(build_technical_role(description))
+
+
+# STAFF_CATEGORIES
+def fake_staff_categories(f):
+    technical_categories = [
+        ("Sound", 1),
+        ("Lighting", 2),
+        ("Stage", 3),
+        ("Video", 4),
+        ("AV Operator", 5),
+        ("Backline", 6),
+        ("Rigging", 7),
+        ("Broadcast", 8)
+    ]
+
+    non_technical_categories = [
+        ("Security", None),
+        ("Assistant", None),
+        ("Coordinator", None),
+        ("Guide", None),
+        ("Usher", None)
+    ]
+
+    def build_staff_category(category_id, desc, tech_id):
+        tech_val = "NULL" if tech_id is None else f"'{tech_id}'"
+        return f"INSERT INTO STAFF_CATEGORIES (staff_category_id, staff_category_desc, technical_id) VALUES ('{category_id}', '{desc}', {tech_val});\n"
+
+    category_id = 1
+    for desc, tech_id in technical_categories + non_technical_categories:
+        f.write(build_staff_category(category_id, desc, tech_id))
+        category_id += 1
