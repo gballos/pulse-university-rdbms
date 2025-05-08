@@ -325,3 +325,23 @@ def fake_performances(f):
 
     for performance in performances:
         f.write(performance)
+
+
+# TECHNICAL_ROLES
+def fake_technical_roles(f):
+    technical_descriptions = [
+        "Sound Engineer",
+        "Lighting Technician",
+        "Stage Manager",
+        "Video Technician",
+        "Audio Visual Operator",
+        "Backline Technician",
+        "Rigging Specialist",
+        "Broadcast Engineer"
+    ]
+
+    def build_technical_role(description):
+        return f"INSERT INTO TECHNICAL_ROLES (technical_description) VALUES ('{description}');\n"
+
+    for description in technical_descriptions:
+        f.write(build_technical_role(description))
