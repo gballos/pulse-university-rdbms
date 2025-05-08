@@ -529,3 +529,30 @@ def fake_likert_ratings(f):
 
     for rating_number, description in likert_scale:
         f.write(build_rating(rating_number, description))
+
+
+# REVIEWS
+def fake_reviews(f):
+    def build_review(review_id):
+        visitor_id = random.randint(1, N_VISITORS)
+        performance_id = random.randint(1, N_PERFORMANCES)
+        interpretation_rating = random.randint(1, 5)
+        sound_lighting_rating = random.randint(1, 5)
+        stage_presence_rating = random.randint(1, 5)
+        organization_rating = random.randint(1, 5)
+        overall_impression_rating = random.randint(1, 5)
+
+        return f"INSERT INTO REVIEWS (review_id, visitor_id, performance_id, interpretation_rating, sound_lighting_rating, stage_presence_rating, organization_rating, overall_impression_rating) VALUES ('{
+                review_id}', '{
+                visitor_id}', '{
+                performance_id}', '{
+                interpretation_rating}', '{
+                sound_lighting_rating}', '{
+                stage_presence_rating}', '{
+                organization_rating}', '{
+                overall_impression_rating}');\n"
+
+    reviews = (build_review(i) for i in range(1, N_REVIEWS + 1))
+
+    for review in reviews:
+        f.write(review)
