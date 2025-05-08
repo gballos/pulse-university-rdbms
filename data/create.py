@@ -231,3 +231,31 @@ def fake_artists(f):
 
     for artist in artists:
         f.write(artist)
+
+
+# BANDS
+def fake_bands(f):
+    fake = faker.Faker()
+
+    def build_band(band_id):
+        name = fake.company()[:25]
+        date_of_creation = fake.date_between(start_date='-50y', end_date='today')
+        music_type_id = random.randint(1, 10)
+        music_subtype_id = random.randint(1, 40)
+        website = fake.url()
+        instagram = "@" + fake.user_name()
+        image = fake.image_url()
+        return f"INSERT INTO BANDS (band_id, name, date_of_creation, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
+            band_id}', '{
+            name}', '{
+            date_of_creation}', '{
+            music_type_id}', '{
+            music_subtype_id}', '{
+            website}', '{
+            instagram}', '{
+            image}');\n"
+
+    bands = (build_band(i) for i in range(1, N_BANDS + 1))
+
+    for band in bands:
+        f.write(band)
