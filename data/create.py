@@ -291,3 +291,37 @@ def fake_performance_types(f):
 
     for performance_type in performance_types:
         f.write(build_performance_type(performance_type))
+
+
+# PERFORMANCES
+def fake_performances(f):
+    fake = faker.Faker()
+
+    def build_performance(performance_id):
+        performance_type_id = random.randint(1, 10)
+        event_id = random.randint(1, N_EVENTS)
+        performance_time = fake.time()
+        duration = random.randint(30, 180)
+        order_in_show = random.randint(1, 10)
+        is_solo = random.choice([0, 1])
+        if is_solo:
+            performer_id = random.randint(1, N_ARTISTS)
+        else:
+            performer_id = random.randint(1, N_BANDS)
+        image = fake.image_url()
+
+        return f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) VALUES ('{
+            performance_id}', '{
+            performance_type_id}', '{
+            event_id}', '{
+            performance_time}', '{
+            duration}', '{
+            order_in_show}', '{
+            is_solo}', '{
+            performer_id}', '{
+            image}');\n"
+
+    performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
+
+    for performance in performances:
+        f.write(performance)
