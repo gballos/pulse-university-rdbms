@@ -575,3 +575,22 @@ def fake_buyers(f):
 
     for buyer in buyers:
         f.write(buyer)
+
+
+# TICKETS_FOR_RESALE
+def fake_tickets_for_resale(f):
+    def build_resale_ticket(resale_id):
+        ticket_id = random.randint(1, N_TICKETS)
+        event_id = random.randint(1, N_EVENTS)
+        ticket_type_id = random.randint(1, 3)
+
+        return f"INSERT INTO TICKETS_FOR_RESALE (ticket_for_resale_id, ticket_id, event_id, ticket_type_id) VALUES ('{
+            resale_id}', '{
+            ticket_id}', '{
+            event_id}', '{
+            ticket_type_id}');\n"
+
+    resale_tickets = (build_resale_ticket(i) for i in range(1, N_RESALE_TICKETS + 1))
+
+    for resale_ticket in resale_tickets:
+        f.write(resale_ticket)
