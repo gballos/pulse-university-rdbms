@@ -259,3 +259,18 @@ def fake_bands(f):
 
     for band in bands:
         f.write(band)
+
+# ARTISTS_X_BANDS
+def fake_artists_x_bands(f):
+    pairs = set()
+
+    while len(pairs) < 150:  # or however many links you want
+        artist_id = random.randint(1, N_ARTISTS)
+        band_id = random.randint(1, N_BANDS)
+        pairs.add((artist_id, band_id))
+
+    def build_artist_band_link(artist_id, band_id):
+        return f"INSERT INTO ARTISTS_X_BANDS (artist_id, band_id) VALUES ('{artist_id}', '{band_id}');\n"
+
+    for artist_id, band_id in pairs:
+        f.write(build_artist_band_link(artist_id, band_id))
