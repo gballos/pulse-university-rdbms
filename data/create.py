@@ -56,3 +56,27 @@ def fake_locations(f):
         f.write(location)
 
   
+# FESTIVALS
+def fake_festivals(f):
+    fake = faker.Faker()
+
+    def build_festivals(festival_id):
+        days = random.randint(1, 5)
+
+        date_starting = fake.date()
+        date_ending = date_starting + datetime.timedelta(days)
+        duration = days
+        location_id = random.randint(1, N_LOCATIONS)
+        image = fake.image_url() 
+        return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{
+            festival_id}', '{
+            date_starting}', '{
+            date_ending}', '{
+            duration}', '{
+            location_id}', '{
+            image}');\n"
+    
+    festivals = (build_festivals(_) for _ in range(1, N_FESTIVALS+1))
+
+    for festival in festivals:
+        f.write(festival)
