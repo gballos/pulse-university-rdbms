@@ -200,3 +200,34 @@ def fake_music_subtypes(f):
 
     for subtype in music_subtypes:
         f.write(build_music_subtype(subtype))
+
+
+# ARTISTS
+def fake_artists(f):
+    fake = faker.Faker()
+
+    def build_artist(artist_id):
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        nickname = fake.user_name()
+        music_type_id = random.randint(1, 10)
+        music_subtype_id = random.randint(1, 40)
+        website = fake.url()
+        instagram = "@" + fake.user_name()
+        image = fake.image_url()
+        
+        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
+            artist_id}', '{
+            first_name}', '{
+            last_name}', '{
+            nickname}', '{
+            music_type_id}', '{
+            music_subtype_id}', '{
+            website}', '{
+            instagram}', '{
+            image}');\n"
+
+    artists = (build_artist(i) for i in range(1, N_ARTISTS + 1))
+
+    for artist in artists:
+        f.write(artist)
