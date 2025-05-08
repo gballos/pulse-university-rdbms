@@ -422,3 +422,28 @@ def fake_staff(f):
 
     for staff in staff_members:
         f.write(staff)
+
+
+# VISITORS
+def fake_visitors(f):
+    fake = faker.Faker()
+
+    def build_visitor(visitor_id):
+        first_name = fake.first_name()
+        last_name = fake.last_name()
+        phone_number = fake.phone_number()
+        email = fake.email()[:20] 
+        age = random.randint(16, 75)
+
+        return f"INSERT INTO VISITORS (visitor_id, first_name, last_name, phone_number, email, age) VALUES ('{
+            visitor_id}', '{
+            first_name}', '{
+            last_name}', '{
+            phone_number}', '{
+            email}', '{
+            age}');\n"
+
+    visitors = (build_visitor(i) for i in range(1, N_VISITORS + 1))
+
+    for visitor in visitors:
+        f.write(visitor)
