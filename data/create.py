@@ -556,3 +556,22 @@ def fake_reviews(f):
 
     for review in reviews:
         f.write(review)
+
+
+# BUYERS
+def fake_buyers(f):
+    def build_buyer(buyer_id):
+        ticket_id = random.randint(1, N_TICKETS)
+        event_id = random.randint(1, N_EVENTS)
+        ticket_type_id = random.randint(1, 3)
+
+        return f"INSERT INTO BUYERS (buyer_id, event_id, ticket_type_id, ticket_id) VALUES ('{
+            buyer_id}', '{
+            event_id}', '{
+            ticket_type_id}', '{
+            ticket_id}');\n"
+
+    buyers = (build_buyer(i) for i in range(1, N_BUYERS + 1))
+
+    for buyer in buyers:
+        f.write(buyer)
