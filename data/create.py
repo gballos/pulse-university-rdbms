@@ -512,3 +512,20 @@ def fake_tickets(f):
 
     for ticket in tickets:
         f.write(ticket)
+
+
+# LIKERT_RATINGS
+def fake_likert_ratings(f):
+    likert_scale = [
+        (1, "Very Bad"),
+        (2, "Bad"),
+        (3, "Neutral"),
+        (4, "Good"),
+        (5, "Excellent")
+    ]
+
+    def build_rating(rating_number, description):
+        return f"INSERT INTO LIKERT_RATINGS (rating_number, rating_description) VALUES ('{rating_number}', '{description}');\n"
+
+    for rating_number, description in likert_scale:
+        f.write(build_rating(rating_number, description))
