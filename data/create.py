@@ -178,3 +178,25 @@ def fake_music_types(f):
 
     for music_type_stmt in music_type_statements:
         f.write(music_type_stmt)
+
+
+# MUSIC_SUBTYPES
+def fake_music_subtypes(f):
+    music_subtypes = [
+        "Alternative Rock", "Hard Rock", "Punk Rock", "Indie Rock",
+        "Synth Pop", "Dance Pop", "Electropop", "Teen Pop",
+        "Trap", "Boom Bap", "Gangsta Rap", "Conscious Hip Hop",
+        "Bebop", "Smooth Jazz", "Swing", "Free Jazz",
+        "Baroque", "Romantic", "Modern Classical", "Minimalism",
+        "House", "Techno", "Trance", "Drum and Bass",
+        "Bluegrass", "Country Pop", "Outlaw Country", "Americana",
+        "Roots Reggae", "Dub", "Dancehall", "Lovers Rock",
+        "Delta Blues", "Chicago Blues", "Electric Blues", "Piedmont Blues",
+        "Death Metal", "Black Metal", "Power Metal", "Thrash Metal"
+    ]
+
+    def build_music_subtype(subtype):
+        return f"INSERT INTO MUSIC_SUBTYPES (music_subtype) VALUES ('{subtype}');\n"
+
+    for subtype in music_subtypes:
+        f.write(build_music_subtype(subtype))
