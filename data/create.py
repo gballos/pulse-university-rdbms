@@ -98,7 +98,23 @@ def fake_stages(f):
             max_capacity}', '{
             image}');\n"
 
-    
+
+# TECHNICAL_SUPPLY
+def fake_technical_supplies(f): 
+    fake = faker.Faker()
+
+    def build_technical_supplies(technical_supply_id):
+        technical_supply_description = fake.paragraph(nb_sentences = 10)
+        image = fake.image_url()
+        return f"INSERT INTO TECHNICAL_SUPPLY (technical_supply_id, technical_supply_description, image) VALUES ('{
+            technical_supply_id}', '{
+            technical_supply_description}', '{
+            image}');\n"
+
+    technical_supplies = (build_technical_supplies(_) for _ in range(1, N_TECHNICAL_SUPPLIES+1)) 
+
+    for technical_supply in technical_supplies:
+        f.write(technical_supply)    
     stages = (build_stages(_) for _ in range(1, N_STAGES+1))
 
     for stage in stages:
