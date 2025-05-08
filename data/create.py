@@ -80,3 +80,26 @@ def fake_festivals(f):
 
     for festival in festivals:
         f.write(festival)
+
+
+# STAGES
+def fake_stages(f):
+    fake = faker.Faker()
+
+    def build_stages(stage_id):
+        stage_name = fake.name()
+        stage_description = fake.paragraph(nb_sentences = 10)
+        max_capacity = random.randint(200, 1000)
+        image = fake.image_url() 
+        return f"INSERT INTO STAGES (stage_id, stage_name, stage_description, max_capacity, image) VALUES ('{
+            stage_id}', '{
+            stage_name}', '{
+            stage_description}', '{
+            max_capacity}', '{
+            image}');\n"
+
+    
+    stages = (build_stages(_) for _ in range(1, N_STAGES+1))
+
+    for stage in stages:
+        f.write(stage)
