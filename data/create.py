@@ -362,9 +362,6 @@ def fake_staff_categories(f):
     non_technical_categories = [
         ("Security", None),
         ("Assistant", None),
-        ("Coordinator", None),
-        ("Guide", None),
-        ("Usher", None)
     ]
 
     def build_staff_category(category_id, desc, tech_id):
@@ -399,7 +396,7 @@ def fake_staff(f):
     fake = faker.Faker()
 
     def build_staff(staff_id):
-        category_id = random.randint(1, 13)
+        category_id = random.randint(1, 10)
         level_id = random.randint(1, 5)
         event_id = random.randint(1, N_EVENTS)
         first_name = fake.first_name()
