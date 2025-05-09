@@ -210,17 +210,19 @@ def fake_artists(f):
         first_name = fake.first_name()
         last_name = fake.last_name()
         nickname = fake.user_name()
+        birthday = fake.date_between(start_date='-100y', end_date='-15y')
         music_type_id = random.randint(1, 10)
         music_subtype_id = random.randint(1, 40)
         website = fake.url()
         instagram = "@" + fake.user_name()
         image = fake.image_url()
         
-        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
+        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, birthday, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
             artist_id}', '{
             first_name}', '{
             last_name}', '{
             nickname}', '{
+            birthday}', '{
             music_type_id}', '{
             music_subtype_id}', '{
             website}', '{
