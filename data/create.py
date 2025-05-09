@@ -282,10 +282,7 @@ def fake_artists_x_bands(f):
 # PERFORMANCE_TYPES
 def fake_performance_types(f):
     performance_types = [
-        "Solo Performance", "Band Performance", "DJ Set",
-        "Orchestral", "Acoustic Session", "Live Jam",
-        "Tribute Act", "Street Performance", "Unplugged",
-        "Multimedia Show"
+        "Warm Up", "Headline", "Special Guest"
     ]
 
     def build_performance_type(performance_type):
@@ -300,7 +297,7 @@ def fake_performances(f):
     fake = faker.Faker()
 
     def build_performance(performance_id):
-        performance_type_id = random.randint(1, 10)
+        performance_type_id = random.randint(1, 3)
         event_id = random.randint(1, N_EVENTS)
         performance_time = fake.time()
         duration = random.randint(30, 180)
