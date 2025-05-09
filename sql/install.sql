@@ -89,6 +89,7 @@ CREATE TABLE ARTISTS(
 	first_name VARCHAR(25),
 	last_name VARCHAR(25),
 	nickname VARCHAR(25),
+	birthday DATE,
 	music_type_id INT UNSIGNED,
 	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website like 'https://%'),
