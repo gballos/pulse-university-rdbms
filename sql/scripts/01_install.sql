@@ -191,7 +191,7 @@ CREATE TABLE VISITORS(
 	visitor_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR(20),
 	last_name VARCHAR(20),
-	phone_number VARCHAR(20),
+	phone_number VARCHAR(40),
 	email VARCHAR(20),
 	age INT,
 	PRIMARY KEY(visitor_id)
