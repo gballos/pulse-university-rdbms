@@ -17,7 +17,7 @@ LEFT JOIN (
     FROM PERFORMANCES p
     JOIN FESTIVAL_EVENTS fe ON fe.event_id = p.event_id
     JOIN FESTIVALS f ON f.festival_id = fe.festival_id
-    WHERE p.is_solo = 1 AND YEAR(f.date_starting) = 2022
+    WHERE p.is_solo = 1 AND YEAR(f.date_starting) = 2019
 
     UNION
 
@@ -29,5 +29,5 @@ LEFT JOIN (
     WHERE p.is_solo = 0 AND YEAR(f.date_starting) = 2022
 ) AS participation ON participation.artist_id = a.artist_id
 
-WHERE mt.music_type = 'Jazz'
+WHERE mt.music_type = 'Rock'
 ORDER BY participated_in_year DESC, a.last_name;

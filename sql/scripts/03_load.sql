@@ -61,7 +61,7 @@ Michaelmouth, KY 40690', 'Jerryborough', 'Germany', 'Africa', '-115.814537', '53
 INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('31', '989 Hooper Village Apt. 435
 West Alexis, ND 17092', 'Brandonton', 'Micronesia', 'South America', '-23.160335', '-56.102108', 'https://picsum.photos/1005/210');
 INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('32', '7520 Everett Neck Apt. 167
-New Crystalton, FL 20056', 'Christopherbury', 'British Indian Ocean Territory (Chagos Archipelago)', 'Europe', '119.613177', '21.7158625', 'https://dummyimage.com/462x779');
+New Crystalton, FL 20056', 'Christopherbury', 'British Indian Ocean Territory', 'Europe', '119.613177', '21.7158625', 'https://dummyimage.com/462x779');
 INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('33', 'PSC 4964, Box 9909
 APO AP 13507', 'Lake Jason', 'Panama', 'South America', '-136.412810', '-47.840308', 'https://placekitten.com/491/355');
 INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('34', '7974 Jesse Squares
