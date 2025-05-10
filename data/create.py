@@ -40,15 +40,7 @@ def fake_locations(f):
         longtitude = fake.longitude()
         latitude = fake.latitude()
         image = fake.image_url()
-        return f"INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('{
-            location_id}', '{
-            address}', '{
-            city}', '{
-            country}', '{
-            continent}', '{
-            longtitude}', '{
-            latitude}', '{
-            image}');\n" 
+        return f"INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('{location_id}', '{address}', '{city}', '{country}', '{continent}', '{longtitude}', '{latitude}', '{image}');\n"
 
     locations = (build_locations(_) for _ in range(1, N_LOCATIONS+1))
 
@@ -63,18 +55,12 @@ def fake_festivals(f):
     def build_festivals(festival_id):
         days = random.randint(1, 5)
 
-        date_starting = fake.date()
+        date_starting = datetime.datetime.strptime(fake.date(), "%Y-%m-%d").date()
         date_ending = date_starting + datetime.timedelta(days)
         duration = days
         location_id = random.randint(1, N_LOCATIONS)
         image = fake.image_url() 
-        return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{
-            festival_id}', '{
-            date_starting}', '{
-            date_ending}', '{
-            duration}', '{
-            location_id}', '{
-            image}');\n"
+        return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
     
     festivals = (build_festivals(_) for _ in range(1, N_FESTIVALS+1))
 
@@ -91,12 +77,8 @@ def fake_stages(f):
         stage_description = fake.paragraph(nb_sentences = 10)
         max_capacity = random.randint(200, 1000)
         image = fake.image_url() 
-        return f"INSERT INTO STAGES (stage_id, stage_name, stage_description, max_capacity, image) VALUES ('{
-            stage_id}', '{
-            stage_name}', '{
-            stage_description}', '{
-            max_capacity}', '{
-            image}');\n"
+        return f"INSERT INTO STAGES (stage_id, stage_name, stage_description, max_capacity, image) VALUES ('{stage_id}', '{stage_name}', '{stage_description}', '{max_capacity}', '{image}');\n"
+
     
     stages = (build_stages(_) for _ in range(1, N_STAGES+1))
 
@@ -111,10 +93,7 @@ def fake_technical_supplies(f):
     def build_technical_supplies(technical_supply_id):
         technical_supply_description = fake.paragraph(nb_sentences = 10)
         image = fake.image_url()
-        return f"INSERT INTO TECHNICAL_SUPPLY (technical_supply_id, technical_supply_description, image) VALUES ('{
-            technical_supply_id}', '{
-            technical_supply_description}', '{
-            image}');\n"
+        return f"INSERT INTO TECHNICAL_SUPPLY (technical_supply_id, technical_supply_description, image) VALUES ('{technical_supply_id}', '{technical_supply_description}', '{image}');\n"
 
     technical_supplies = (build_technical_supplies(_) for _ in range(1, N_TECHNICAL_SUPPLIES+1)) 
 
@@ -147,13 +126,7 @@ def fake_festival_events(f):
         event_date = fake.date()
         duration = random.randint(60, 180)
         image = fake.image_url()
-        return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{
-            event_id}', '{
-            festival_id}', '{
-            stage_id}', '{
-            event_date}', '{
-            duration}', '{
-            image}');\n"
+        return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{event_id}', '{festival_id}', '{stage_id}', '{event_date}', '{duration}', '{image}');\n"
 
     festival_events = (build_festivaL_events(_) for _ in range(1, N_EVENTS+1)) 
 
@@ -217,17 +190,7 @@ def fake_artists(f):
         instagram = "@" + fake.user_name()
         image = fake.image_url()
         
-        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, birthday, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
-            artist_id}', '{
-            first_name}', '{
-            last_name}', '{
-            nickname}', '{
-            birthday}', '{
-            music_type_id}', '{
-            music_subtype_id}', '{
-            website}', '{
-            instagram}', '{
-            image}');\n"
+        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, birthday, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{artist_id}', '{first_name}', '{last_name}', '{nickname}', '{birthday}', '{music_type_id}', '{music_subtype_id}', '{website}', '{instagram}', '{image}');\n"
 
     artists = (build_artist(i) for i in range(1, N_ARTISTS + 1))
 
@@ -247,15 +210,7 @@ def fake_bands(f):
         website = fake.url()
         instagram = "@" + fake.user_name()
         image = fake.image_url()
-        return f"INSERT INTO BANDS (band_id, name, date_of_creation, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{
-            band_id}', '{
-            name}', '{
-            date_of_creation}', '{
-            music_type_id}', '{
-            music_subtype_id}', '{
-            website}', '{
-            instagram}', '{
-            image}');\n"
+        return f"INSERT INTO BANDS (band_id, name, date_of_creation, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{band_id}', '{name}', '{date_of_creation}', '{music_type_id}', '{music_subtype_id}', '{website}', '{instagram}', '{image}');\n"
 
     bands = (build_band(i) for i in range(1, N_BANDS + 1))
 
@@ -309,16 +264,7 @@ def fake_performances(f):
             performer_id = random.randint(1, N_BANDS)
         image = fake.image_url()
 
-        return f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) VALUES ('{
-            performance_id}', '{
-            performance_type_id}', '{
-            event_id}', '{
-            performance_time}', '{
-            duration}', '{
-            order_in_show}', '{
-            is_solo}', '{
-            performer_id}', '{
-            image}');\n"
+        return f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) VALUES ('{performance_id}', '{performance_type_id}', '{event_id}', '{performance_time}', '{duration}', '{order_in_show}', '{is_solo}', '{performer_id}', '{image}');\n"
 
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
 
@@ -401,18 +347,10 @@ def fake_staff(f):
         event_id = random.randint(1, N_EVENTS)
         first_name = fake.first_name()
         last_name = fake.last_name()
-        age = random.randint(18, 65)
+        age = random.randint(18, 65)  
         image = fake.image_url()
 
-        return f"INSERT INTO STAFF (staff_id, category_id, level_id, event_id, first_name, last_name, age, image) VALUES ('{
-            staff_id}', '{
-            category_id}', '{
-            level_id}', '{
-            event_id}', '{
-            first_name}', '{
-            last_name}', '{
-            age}', '{
-            image}');\n"
+        return f"INSERT INTO STAFF (staff_id, category_id, level_id, event_id, first_name, last_name, age, image) VALUES ('{staff_id}', '{category_id}', '{level_id}', '{event_id}', '{first_name}', '{last_name}', '{age}', '{image}');\n"
 
     staff_members = (build_staff(i) for i in range(1, N_STAFF + 1))
 
@@ -431,13 +369,7 @@ def fake_visitors(f):
         email = fake.email()[:20] 
         age = random.randint(16, 75)
 
-        return f"INSERT INTO VISITORS (visitor_id, first_name, last_name, phone_number, email, age) VALUES ('{
-            visitor_id}', '{
-            first_name}', '{
-            last_name}', '{
-            phone_number}', '{
-            email}', '{
-            age}');\n"
+        return f"INSERT INTO VISITORS (visitor_id, first_name, last_name, phone_number, email, age) VALUES ('{visitor_id}', '{first_name}', '{last_name}', '{phone_number}', '{email}', '{age}');\n"
 
     visitors = (build_visitor(i) for i in range(1, N_VISITORS + 1))
 
@@ -493,16 +425,7 @@ def fake_tickets(f):
         date_bought = fake.date_between(start_date='-1y', end_date='today')
         cost = random.randint(20, 200)
 
-        return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{
-            ticket_id}', '{
-            event_id}', '{
-            visitor_id}', '{
-            ticket_type_id}', '{
-            payment_method_id}', '{
-            ean_code}', '{
-            is_scanned}', '{
-            date_bought}', '{
-            cost}');\n"
+        return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{ticket_id}', '{event_id}', '{visitor_id}', '{ticket_type_id}', '{payment_method_id}', '{ean_code}', '{is_scanned}', '{date_bought}', '{cost}');\n"
 
     tickets = (build_ticket(i) for i in range(1, N_TICKETS + 1))
 
@@ -538,21 +461,12 @@ def fake_reviews(f):
         organization_rating = random.randint(1, 5)
         overall_impression_rating = random.randint(1, 5)
 
-        return f"INSERT INTO REVIEWS (review_id, visitor_id, performance_id, interpretation_rating, sound_lighting_rating, stage_presence_rating, organization_rating, overall_impression_rating) VALUES ('{
-                review_id}', '{
-                visitor_id}', '{
-                performance_id}', '{
-                interpretation_rating}', '{
-                sound_lighting_rating}', '{
-                stage_presence_rating}', '{
-                organization_rating}', '{
-                overall_impression_rating}');\n"
+        return f"INSERT INTO REVIEWS (review_id, visitor_id, performance_id, interpretation_rating, sound_lighting_rating, stage_presence_rating, organization_rating, overall_impression_rating) VALUES ('{review_id}', '{visitor_id}', '{performance_id}', '{interpretation_rating}', '{sound_lighting_rating}', '{stage_presence_rating}', '{organization_rating}', '{overall_impression_rating}');\n"
 
     reviews = (build_review(i) for i in range(1, N_REVIEWS + 1))
 
     for review in reviews:
         f.write(review)
-
 
 # BUYERS
 def fake_buyers(f):
@@ -561,11 +475,7 @@ def fake_buyers(f):
         event_id = random.randint(1, N_EVENTS)
         ticket_type_id = random.randint(1, 3)
 
-        return f"INSERT INTO BUYERS (buyer_id, event_id, ticket_type_id, ticket_id) VALUES ('{
-            buyer_id}', '{
-            event_id}', '{
-            ticket_type_id}', '{
-            ticket_id}');\n"
+        return f"INSERT INTO BUYERS (buyer_id, event_id, ticket_type_id, ticket_id) VALUES ('{buyer_id}', '{event_id}', '{ticket_type_id}', '{ticket_id}');\n"
 
     buyers = (build_buyer(i) for i in range(1, N_BUYERS + 1))
 
@@ -580,11 +490,7 @@ def fake_tickets_for_resale(f):
         event_id = random.randint(1, N_EVENTS)
         ticket_type_id = random.randint(1, 3)
 
-        return f"INSERT INTO TICKETS_FOR_RESALE (ticket_for_resale_id, ticket_id, event_id, ticket_type_id) VALUES ('{
-            resale_id}', '{
-            ticket_id}', '{
-            event_id}', '{
-            ticket_type_id}');\n"
+        return f"INSERT INTO TICKETS_FOR_RESALE (ticket_for_resale_id, ticket_id, event_id, ticket_type_id) VALUES ('{resale_id}', '{ticket_id}', '{event_id}', '{ticket_type_id}');\n"
 
     resale_tickets = (build_resale_ticket(i) for i in range(1, N_RESALE_TICKETS + 1))
 
