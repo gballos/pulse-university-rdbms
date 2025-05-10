@@ -180,8 +180,8 @@ SELECT
   s.max_capacity,
 
   SUM(CASE WHEN sc.staff_category_desc = 'technical' THEN 1 ELSE 0 END) AS technical_assigned,
-  SUM(CASE WHEN sc.staff_category_desc = 'security' THEN 1 ELSE 0 END) AS security_assigned,
-  SUM(CASE WHEN sc.staff_category_desc = 'general' THEN 1 ELSE 0 END) AS general_assigned,
+  SUM(CASE WHEN sc.staff_category_desc = 'Security' THEN 1 ELSE 0 END) AS security_assigned,
+  SUM(CASE WHEN sc.staff_category_desc = 'Assistant' THEN 1 ELSE 0 END) AS general_assigned,
 
 
   CEIL(s.max_capacity * 0.05) AS security_required,
