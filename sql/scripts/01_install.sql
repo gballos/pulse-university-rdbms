@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS STAGES;
 CREATE TABLE STAGES (
 	stage_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     stage_name VARCHAR(50),
-    stage_description VARCHAR(50),
+    stage_description VARCHAR(800),
     max_capacity INT,
     image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(stage_id)
@@ -41,7 +41,7 @@ CREATE TABLE STAGES (
 DROP TABLE IF EXISTS TECHNICAL_SUPPLY; 
 CREATE TABLE TECHNICAL_SUPPLY(
 	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	technical_supply_description VARCHAR(50),
+	technical_supply_description VARCHAR(800),
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(technical_supply_id)
 );
@@ -92,7 +92,7 @@ CREATE TABLE ARTISTS(
 	birthday DATE,
 	music_type_id INT UNSIGNED,
 	music_subtype_id INT UNSIGNED,
-	website VARCHAR(100) CHECK(website like 'https://%'),
+	website VARCHAR(100) CHECK(website like 'https://%' or 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(artist_id),
