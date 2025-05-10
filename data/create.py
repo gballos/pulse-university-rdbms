@@ -481,10 +481,12 @@ def fake_reviews(f):
 
         return f"INSERT INTO REVIEWS (review_id, visitor_id, performance_id, interpretation_rating, sound_lighting_rating, stage_presence_rating, organization_rating, overall_impression_rating) VALUES ('{review_id}', '{visitor_id}', '{performance_id}', '{interpretation_rating}', '{sound_lighting_rating}', '{stage_presence_rating}', '{organization_rating}', '{overall_impression_rating}');\n"
 
-    reviews = (build_review(i) for i in range(1, N_REVIEWS + 1))
-
-    for review in reviews:
-        f.write(review)
+    i = 1
+    while i <= N_REVIEWS:
+        review = build_review(i)
+        if review is not None:
+            f.write(review)
+            i += 1  
 
 # BUYERS
 def fake_buyers(f):
