@@ -48,7 +48,7 @@ def fake_locations(f):
             continent}', '{
             longtitude}', '{
             latitude}', '{
-            image}');\n"
+            image}');\n" 
 
     locations = (build_locations(_) for _ in range(1, N_LOCATIONS+1))
 
@@ -97,6 +97,11 @@ def fake_stages(f):
             stage_description}', '{
             max_capacity}', '{
             image}');\n"
+    
+    stages = (build_stages(_) for _ in range(1, N_STAGES+1))
+
+    for stage in stages:
+        f.write(stage)
 
 
 # TECHNICAL_SUPPLY
@@ -115,11 +120,6 @@ def fake_technical_supplies(f):
 
     for technical_supply in technical_supplies:
         f.write(technical_supply)    
-    stages = (build_stages(_) for _ in range(1, N_STAGES+1))
-
-    for stage in stages:
-        f.write(stage)
-
 
 # STAGES_X_TECHNICAL_SUPPLY
 def fake_stages_x_technical_supply(f):
