@@ -179,13 +179,13 @@ SELECT
   fe.stage_id,
   s.max_capacity,
 
-  SUM(CASE WHEN sc.staff_category_desc = 'technical' THEN 1 ELSE 0 END) AS technical_assigned,
-  SUM(CASE WHEN sc.staff_category_desc = 'Security' THEN 1 ELSE 0 END) AS security_assigned,
-  SUM(CASE WHEN sc.staff_category_desc = 'Assistant' THEN 1 ELSE 0 END) AS general_assigned,
+  SUM(IF(sc.technical_id IS NOT NULL, 1, 0)) AS technical_assigned,
+  SUM(IF(sc.staff_category_desc = 'Security', 1, 0))  AS security_assigned,
+  SUM(IF(sc.staff_category_desc = 'Assistant', 1, 0)) AS general_assigned,
 
 
-  CEIL(s.max_capacity * 0.05) AS security_required,
-  CEIL(s.max_capacity * 0.02) AS general_required
+  CEIL(s.max_capacity * 0.05)                         AS security_required,
+  CEIL(s.max_capacity * 0.02)                         AS general_required
 
 FROM FESTIVAL_EVENTS fe
 JOIN STAGES s ON fe.stage_id = s.stage_id

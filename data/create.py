@@ -17,6 +17,9 @@ N_REVIEWS = 300
 N_BUYERS = 200
 N_RESALE_TICKETS = 50
 
+scanned_visitor_ids = []
+event_perf_ids = []
+
 random.seed(42)
 faker.Faker.seed(42)
 
@@ -74,7 +77,7 @@ def fake_stages(f):
 
     def build_stages(stage_id):
         stage_name = fake.name()
-        stage_description = fake.paragraph(nb_sentences = 10)
+        stage_description = fake.paragraph(nb_sentences = 2)
         max_capacity = random.randint(200, 1000)
         image = fake.image_url() 
         return f"INSERT INTO STAGES (stage_id, stage_name, stage_description, max_capacity, image) VALUES ('{stage_id}', '{stage_name}', '{stage_description}', '{max_capacity}', '{image}');\n"
@@ -91,7 +94,7 @@ def fake_technical_supplies(f):
     fake = faker.Faker()
 
     def build_technical_supplies(technical_supply_id):
-        technical_supply_description = fake.paragraph(nb_sentences = 10)
+        technical_supply_description = fake.paragraph(nb_sentences = 2)
         image = fake.image_url()
         return f"INSERT INTO TECHNICAL_SUPPLY (technical_supply_id, technical_supply_description, image) VALUES ('{technical_supply_id}', '{technical_supply_description}', '{image}');\n"
 
@@ -264,6 +267,8 @@ def fake_performances(f):
             performer_id = random.randint(1, N_BANDS)
         image = fake.image_url()
 
+        event_perf_ids.append((event_id, performance_id))
+
         return f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) VALUES ('{performance_id}', '{performance_type_id}', '{event_id}', '{performance_time}', '{duration}', '{order_in_show}', '{is_solo}', '{performer_id}', '{image}');\n"
 
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
@@ -425,6 +430,9 @@ def fake_tickets(f):
         date_bought = fake.date_between(start_date='-1y', end_date='today')
         cost = random.randint(20, 200)
 
+        if is_scanned:
+            scanned_visitor_ids.append((visitor_id,event_id))
+
         return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{ticket_id}', '{event_id}', '{visitor_id}', '{ticket_type_id}', '{payment_method_id}', '{ean_code}', '{is_scanned}', '{date_bought}', '{cost}');\n"
 
     tickets = (build_ticket(i) for i in range(1, N_TICKETS + 1))
@@ -453,8 +461,18 @@ def fake_likert_ratings(f):
 # REVIEWS
 def fake_reviews(f):
     def build_review(review_id):
-        visitor_id = random.randint(1, N_VISITORS)
-        performance_id = random.randint(1, N_PERFORMANCES)
+        if not scanned_visitor_ids:
+            return None  # No scanned tickets available to create a review
+
+        # Select a random scanned visitor and event
+        visitor_id, event_id = random.choice(scanned_visitor_ids)
+
+        # Find a performance for the selected event
+        valid_performances = [perf_id for evt_id, perf_id in event_perf_ids if evt_id == event_id]
+        if not valid_performances:
+            return None  # No valid performances for the event
+        
+        performance_id = random.choice(valid_performances)
         interpretation_rating = random.randint(1, 5)
         sound_lighting_rating = random.randint(1, 5)
         stage_presence_rating = random.randint(1, 5)
