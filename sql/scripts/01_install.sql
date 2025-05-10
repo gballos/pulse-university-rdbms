@@ -107,7 +107,7 @@ CREATE TABLE BANDS(
 	date_of_creation DATE,
 	music_type_id INT UNSIGNED,
 	music_subtype_id INT UNSIGNED,
-	website VARCHAR(100) CHECK(website like 'https://%'),
+	website VARCHAR(100) CHECK(website like 'https://%' or 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(band_id),
