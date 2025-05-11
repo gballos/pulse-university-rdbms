@@ -3,6 +3,7 @@ USE pulse_uni_db;
 SET @artist_id = 42;
 
 -- simple query 
+-- EXPLAIN ANALYZE
 SELECT
     a.artist_id,
     a.first_name,
