@@ -5,7 +5,7 @@ USE pulse_uni_db;
 DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
 	location_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    address VARCHAR(50),
+    address VARCHAR(100),
     city VARCHAR(50),
     country VARCHAR(50),
     continent VARCHAR(50),
@@ -32,7 +32,7 @@ DROP TABLE IF EXISTS STAGES;
 CREATE TABLE STAGES (
 	stage_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     stage_name VARCHAR(50),
-    stage_description VARCHAR(50),
+    stage_description VARCHAR(150),
     max_capacity INT,
     image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(stage_id)
@@ -41,7 +41,7 @@ CREATE TABLE STAGES (
 DROP TABLE IF EXISTS TECHNICAL_SUPPLY; 
 CREATE TABLE TECHNICAL_SUPPLY(
 	technical_supply_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	technical_supply_description VARCHAR(50),
+	technical_supply_description VARCHAR(150),
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(technical_supply_id)
 );
@@ -89,9 +89,10 @@ CREATE TABLE ARTISTS(
 	first_name VARCHAR(25),
 	last_name VARCHAR(25),
 	nickname VARCHAR(25),
+	birthday DATE,
 	music_type_id INT UNSIGNED,
 	music_subtype_id INT UNSIGNED,
-	website VARCHAR(100) CHECK(website like 'https://%'),
+	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(image like 'https://%'),
 	PRIMARY KEY(artist_id),
@@ -106,9 +107,9 @@ CREATE TABLE BANDS(
 	date_of_creation DATE,
 	music_type_id INT UNSIGNED,
 	music_subtype_id INT UNSIGNED,
-	website VARCHAR(100) CHECK(website like 'https://%'),
+	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
-    image VARCHAR(100), CHECK(image like 'https://%'),
+    image VARCHAR(100), CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	PRIMARY KEY(band_id),
 	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
 	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
@@ -190,7 +191,7 @@ CREATE TABLE VISITORS(
 	visitor_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	first_name VARCHAR(20),
 	last_name VARCHAR(20),
-	phone_number VARCHAR(20),
+	phone_number VARCHAR(40),
 	email VARCHAR(20),
 	age INT,
 	PRIMARY KEY(visitor_id)
