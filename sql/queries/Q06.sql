@@ -2,7 +2,8 @@ USE pulse_uni_db;
 
 SET @visitor_id = 42;
 
---simple query
+-- simple query
+-- EXPLAIN ANALYZE
 SELECT
     r.visitor_id,
     r.performance_id,
