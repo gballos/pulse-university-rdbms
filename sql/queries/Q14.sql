@@ -10,9 +10,27 @@ WITH appearances_per_year AS (
     JOIN ARTISTS a ON p.performer_id = a.artist_id AND p.is_solo = 1
     JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
     JOIN FESTIVALS f ON fe.festival_id = f.festival_id
-    JOIN MUSIC_TYPES mt ON a.music_type_id = mt.music_type_id
+    JOIN ARTISTS_X_MUSIC am on a.artist_id = am.artist_id
+    JOIN MUSIC_TYPES mt ON am.music_type_id = mt.music_type_id
     GROUP BY mt.music_type_id, mt.music_type, YEAR(f.date_starting)
-    HAVING COUNT(*) >= 3
+    HAVING COUNT(*) >= 1
+
+    UNION
+
+    SELECT
+        mt.music_type_id,
+        mt.music_type,
+        YEAR(f.date_starting) AS year,
+        COUNT(*) AS appearance_count
+    FROM PERFORMANCES p
+    JOIN ARTISTS_X_BANDS ab ON p.performer_id = ab.band_id AND p.is_solo = 0
+    JOIN ARTISTS a ON ab.artist_id = a.artist_id
+    JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
+    JOIN FESTIVALS f ON fe.festival_id = f.festival_id
+    JOIN ARTISTS_X_MUSIC am on a.artist_id = am.artist_id
+    JOIN MUSIC_TYPES mt ON am.music_type_id = mt.music_type_id
+    GROUP BY mt.music_type_id, mt.music_type, YEAR(f.date_starting)
+    HAVING COUNT(*) >= 1
 ),
 consecutive_years AS (
     SELECT
