@@ -3,16 +3,16 @@ import faker
 import datetime
 
 N_LOCATIONS = 100
-N_FESTIVALS = 100
+N_FESTIVALS = 75
 N_STAGES = 150
 N_TECHNICAL_SUPPLIES = 50
-N_EVENTS = 100
-N_ARTISTS = 350
+N_EVENTS = 300
+N_ARTISTS = 200
 N_BANDS = 100
-N_PERFORMANCES = 500
-N_STAFF = 500
-N_VISITORS = 300
-N_TICKETS = 350
+N_PERFORMANCES = 1500
+N_STAFF = 2000
+N_VISITORS = 100
+N_TICKETS = 3000
 N_REVIEWS = 300
 N_BUYERS = 200
 N_RESALE_TICKETS = 50
@@ -547,7 +547,7 @@ def fake_tickets_for_resale(f):
         f.write(resale_ticket)
 
 
-with open("load.sql", "w") as f:
+with open("03_load.sql", "w") as f:
     fake_locations(f)
     fake_festivals(f)
     fake_stages(f)
@@ -557,6 +557,7 @@ with open("load.sql", "w") as f:
     fake_artists(f)
     fake_artists_x_music(f)
     fake_bands(f)
+    fake_bands_x_music(f)
     fake_artists_x_bands(f)
     fake_performance_types(f)
     fake_festival_events(f)

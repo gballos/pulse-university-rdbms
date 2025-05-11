@@ -12,4 +12,4 @@ JOIN FESTIVAL_EVENTS fe ON t.event_id = fe.event_id
 WHERE t.is_scanned = 1
 GROUP BY t.visitor_id, YEAR(fe.event_date)
 HAVING COUNT(*) > 0
-ORDER BY num_performances DESC, visitor_id;
+ORDER BY num_performances DESC;
