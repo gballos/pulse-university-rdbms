@@ -187,19 +187,32 @@ def fake_artists(f):
         last_name = fake.last_name()
         nickname = fake.user_name()
         birthday = fake.date_between(start_date='-100y', end_date='-15y')
-        music_type_id = random.randint(1, 10)
-        music_subtype_id = random.randint(1, 40)
         website = fake.url()
         instagram = "@" + fake.user_name()
         image = fake.image_url()
         
-        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, birthday, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{artist_id}', '{first_name}', '{last_name}', '{nickname}', '{birthday}', '{music_type_id}', '{music_subtype_id}', '{website}', '{instagram}', '{image}');\n"
+        return f"INSERT INTO ARTISTS (artist_id, first_name, last_name, nickname, birthday, website, instagram, image) VALUES ('{artist_id}', '{first_name}', '{last_name}', '{nickname}', '{birthday}', '{website}', '{instagram}', '{image}');\n"
 
     artists = (build_artist(i) for i in range(1, N_ARTISTS + 1))
 
     for artist in artists:
         f.write(artist)
 
+# ARTISTS_X_MUSIC
+def fake_artists_x_music(f):
+    pairs = set()
+
+    while len(pairs) < 150:  # or however many links you want
+        artist_id = random.randint(1, N_ARTISTS)
+        music_type_id = random.randint(1, 10)
+        music_subtype_id = random.randint(1, 40)
+        pairs.add((artist_id, music_type_id, music_subtype_id))
+
+    def build_artist_music_link(artist_id, music_type_id, music_subtype_id):
+        return f"INSERT INTO ARTISTS_X_MUSIC (artist_id, music_type_id, music_subtype_id) VALUES ('{artist_id}', '{music_type_id}', '{music_subtype_id}');\n"
+
+    for artist_id, music_type_id, music_subtype_id in pairs:
+        f.write(build_artist_music_link(artist_id, music_type_id, music_subtype_id))
 
 # BANDS
 def fake_bands(f):
@@ -213,12 +226,28 @@ def fake_bands(f):
         website = fake.url()
         instagram = "@" + fake.user_name()
         image = fake.image_url()
-        return f"INSERT INTO BANDS (band_id, name, date_of_creation, music_type_id, music_subtype_id, website, instagram, image) VALUES ('{band_id}', '{name}', '{date_of_creation}', '{music_type_id}', '{music_subtype_id}', '{website}', '{instagram}', '{image}');\n"
+        return f"INSERT INTO BANDS (band_id, name, date_of_creation, website, instagram, image) VALUES ('{band_id}', '{name}', '{date_of_creation}', '{website}', '{instagram}', '{image}');\n"
 
     bands = (build_band(i) for i in range(1, N_BANDS + 1))
 
     for band in bands:
         f.write(band)
+
+# BANDS_X_MUSIC
+def fake_bands_x_music(f):
+    pairs = set()
+
+    while len(pairs) < 150:  # or however many links you want
+        artist_id = random.randint(1, N_BANDS)
+        music_type_id = random.randint(1, 10)
+        music_subtype_id = random.randint(1, 40)
+        pairs.add((artist_id, music_type_id, music_subtype_id))
+
+    def build_artist_music_link(artist_id, music_type_id, music_subtype_id):
+        return f"INSERT INTO ARTISTS_X_MUSIC (artist_id, music_type_id, music_subtype_id) VALUES ('{artist_id}', '{music_type_id}', '{music_subtype_id}');\n"
+
+    for artist_id, music_type_id, music_subtype_id in pairs:
+        f.write(build_artist_music_link(artist_id, music_type_id, music_subtype_id))    
 
 
 # ARTISTS_X_BANDS
@@ -526,6 +555,7 @@ with open("load.sql", "w") as f:
     fake_music_types(f)
     fake_music_subtypes(f)
     fake_artists(f)
+    fake_artists_x_music(f)
     fake_bands(f)
     fake_artists_x_bands(f)
     fake_performance_types(f)
