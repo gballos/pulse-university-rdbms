@@ -13,7 +13,7 @@ WITH appearances_per_year AS (
     JOIN ARTISTS_X_MUSIC am on a.artist_id = am.artist_id
     JOIN MUSIC_TYPES mt ON am.music_type_id = mt.music_type_id
     GROUP BY mt.music_type_id, mt.music_type, YEAR(f.date_starting)
-    HAVING COUNT(*) >= 1
+    HAVING COUNT(*) >= 3
 
     UNION
 
@@ -30,7 +30,7 @@ WITH appearances_per_year AS (
     JOIN ARTISTS_X_MUSIC am on a.artist_id = am.artist_id
     JOIN MUSIC_TYPES mt ON am.music_type_id = mt.music_type_id
     GROUP BY mt.music_type_id, mt.music_type, YEAR(f.date_starting)
-    HAVING COUNT(*) >= 1
+    HAVING COUNT(*) >= 3
 ),
 consecutive_years AS (
     SELECT
