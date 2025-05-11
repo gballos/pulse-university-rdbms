@@ -1,13 +1,14 @@
 import random 
 import faker
 import datetime
+from collections import defaultdict
 
 N_LOCATIONS = 100
-N_FESTIVALS = 75
+N_FESTIVALS = 100
 N_STAGES = 150
 N_TECHNICAL_SUPPLIES = 50
 N_EVENTS = 300
-N_ARTISTS = 200
+N_ARTISTS = 250
 N_BANDS = 100
 N_PERFORMANCES = 1500
 N_STAFF = 2000
@@ -19,9 +20,26 @@ N_RESALE_TICKETS = 50
 
 scanned_visitor_ids = []
 event_perf_ids = []
+festival_years = {}
+event_years = {}
+performer_years = defaultdict(set)
 
 random.seed(42)
 faker.Faker.seed(42)
+
+
+# Check if any performer has performed at the same festival for 4 consecutive years
+def has_4_consecutive_years(years_set):
+    years = sorted(years_set)
+    streak = 1
+    for i in range(1, len(years)):
+        if years[i] == years[i - 1] + 1:
+            streak += 1
+            if streak >= 3:
+                return True
+        else:
+            streak = 1
+    return False
 
 # LOCATIONS
 def fake_locations(f):
@@ -63,8 +81,10 @@ def fake_festivals(f):
         duration = days
         location_id = random.randint(1, N_LOCATIONS)
         image = fake.image_url() 
+        festival_years[festival_id] = date_starting.year
+
         return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
-    
+        
     festivals = (build_festivals(_) for _ in range(1, N_FESTIVALS+1))
 
     for festival in festivals:
@@ -129,6 +149,8 @@ def fake_festival_events(f):
         event_date = fake.date()
         duration = random.randint(60, 180)
         image = fake.image_url()
+
+        event_years[event_id] = festival_years[festival_id]
         return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{event_id}', '{festival_id}', '{stage_id}', '{event_date}', '{duration}', '{image}');\n"
 
     festival_events = (build_festivaL_events(_) for _ in range(1, N_EVENTS+1)) 
@@ -238,16 +260,16 @@ def fake_bands_x_music(f):
     pairs = set()
 
     while len(pairs) < 150:  # or however many links you want
-        artist_id = random.randint(1, N_BANDS)
+        band_id = random.randint(1, N_BANDS)
         music_type_id = random.randint(1, 10)
         music_subtype_id = random.randint(1, 40)
-        pairs.add((artist_id, music_type_id, music_subtype_id))
+        pairs.add((band_id, music_type_id, music_subtype_id))
 
-    def build_artist_music_link(artist_id, music_type_id, music_subtype_id):
-        return f"INSERT INTO ARTISTS_X_MUSIC (artist_id, music_type_id, music_subtype_id) VALUES ('{artist_id}', '{music_type_id}', '{music_subtype_id}');\n"
+    def build_artist_music_link(band_id, music_type_id, music_subtype_id):
+        return f"INSERT INTO BANDS_X_MUSIC (band_id, music_type_id, music_subtype_id) VALUES ('{band_id}', '{music_type_id}', '{music_subtype_id}');\n"
 
-    for artist_id, music_type_id, music_subtype_id in pairs:
-        f.write(build_artist_music_link(artist_id, music_type_id, music_subtype_id))    
+    for band_id, music_type_id, music_subtype_id in pairs:
+        f.write(build_artist_music_link(band_id, music_type_id, music_subtype_id))    
 
 
 # ARTISTS_X_BANDS
@@ -284,21 +306,37 @@ def fake_performances(f):
     fake = faker.Faker()
 
     def build_performance(performance_id):
-        performance_type_id = random.randint(1, 3)
-        event_id = random.randint(1, N_EVENTS)
-        performance_time = fake.time()
-        duration = random.randint(30, 180)
-        order_in_show = random.randint(1, 10)
-        is_solo = random.choice([0, 1])
-        if is_solo:
-            performer_id = random.randint(1, N_ARTISTS)
-        else:
-            performer_id = random.randint(1, N_BANDS)
-        image = fake.image_url()
+        while True:
+            performance_type_id = random.randint(1, 3)
+            event_id = random.randint(1, N_EVENTS)
+            performance_time = fake.time()
+            duration = random.randint(30, 180)
+            order_in_show = random.randint(1, 10)
+            is_solo = random.choice([0, 1])
+            performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
+            image = fake.image_url()
 
-        event_perf_ids.append((event_id, performance_id))
+            # Absolute mapping: event_id → festival_id
+            year = event_years.get(event_id)
+            if not year:
+                continue
 
-        return f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) VALUES ('{performance_id}', '{performance_type_id}', '{event_id}', '{performance_time}', '{duration}', '{order_in_show}', '{is_solo}', '{performer_id}', '{image}');\n"
+            key = (performer_id, is_solo)
+            existing_years = performer_years[key]
+
+            # Temporarily add the new year and check for 4 consecutive years
+            new_years = existing_years.union({year})
+            if has_4_consecutive_years(new_years):
+                continue  # try again with different performer/event
+
+            # Valid → store and return
+            performer_years[key].add(year)
+            event_perf_ids.append((event_id, performance_id))
+
+            return (
+                f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) "
+                f"VALUES ('{performance_id}', '{performance_type_id}', '{event_id}', '{performance_time}', '{duration}', '{order_in_show}', '{is_solo}', '{performer_id}', '{image}');\n"
+            )
 
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
 
