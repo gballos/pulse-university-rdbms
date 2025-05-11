@@ -26,4 +26,4 @@ CREATE INDEX idx_performances_performers ON PERFORMANCES(performance_id, perform
 CREATE INDEX idx_reviews_visitors_performances ON REVIEWS(visitor_id, performance_id);
 
 -- staff queries 7, 12   /   filter event & categories
-CREATE INDEX idx_staff_event_level ON STAFF(event_id, staff_category_id);
+CREATE INDEX idx_staff_event_level ON STAFF(event_id, category_id);
