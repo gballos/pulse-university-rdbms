@@ -90,14 +90,10 @@ CREATE TABLE ARTISTS(
 	last_name VARCHAR(25),
 	nickname VARCHAR(25),
 	birthday DATE,
-	music_type_id INT UNSIGNED,
-	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(image like 'https://%'),
-	PRIMARY KEY(artist_id),
-	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
-	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+	PRIMARY KEY(artist_id)
 );	
 
 DROP TABLE IF EXISTS BANDS;
@@ -105,14 +101,10 @@ CREATE TABLE BANDS(
 	band_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name VARCHAR(25),
 	date_of_creation DATE,
-	music_type_id INT UNSIGNED,
-	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
-	PRIMARY KEY(band_id),
-	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
-	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+	PRIMARY KEY(band_id)
 );
 
 DROP TABLE IF EXISTS ARTISTS_X_BANDS; 
@@ -122,6 +114,28 @@ CREATE TABLE ARTISTS_X_BANDS(
 	PRIMARY KEY(artist_id, band_id),
 	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id),
 	FOREIGN KEY(band_id) REFERENCES BANDS(band_id)
+);
+
+DROP TABLE IF EXISTS ARTISTS_X_MUSIC;
+CREATE TABLE ARTISTS_X_MUSIC (
+    artist_id INT UNSIGNED NOT NULL,
+    music_type_id INT UNSIGNED,
+    music_subtype_id INT UNSIGNED,
+    PRIMARY KEY(artist_id, music_type_id, music_subtype_id),
+    FOREIGN KEY (artist_id) REFERENCES ARTISTS(artist_id),
+    FOREIGN KEY (music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+    FOREIGN KEY (music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+);
+
+DROP TABLE IF EXISTS BANDS_X_MUSIC;
+CREATE TABLE BANDS_X_MUSIC (
+    band_id INT UNSIGNED NOT NULL,
+    music_type_id INT UNSIGNED,
+    music_subtype_id INT UNSIGNED,
+    PRIMARY KEY(band_id, music_type_id, music_subtype_id),
+    FOREIGN KEY (band_id) REFERENCES BANDS(band_id),
+    FOREIGN KEY (music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+    FOREIGN KEY (music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
 );
 
 DROP TABLE IF EXISTS PERFORMANCE_TYPES;
