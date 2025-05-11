@@ -17,4 +17,4 @@ CREATE INDEX idx_events_performers ON PERFORMANCES(event_id, performer_id);
 
 -- for queries 6,9,15  /  require both visitors and events 
 -- useful for the big number of tickets
-CREATE INDEX idx_tickets_visitor_event ON TICKETS(visitor_id, event_id);
+CREATE INDEX idx_tickets_visitors_events ON TICKETS(visitor_id, event_id);
