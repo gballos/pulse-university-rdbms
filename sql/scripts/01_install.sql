@@ -303,7 +303,7 @@ CREATE TABLE TICKETS_FOR_RESALE(
 
 -- TRIGGERS 
 
--- Delete triggers for performances.
+-- Delete trigger for performances
 DROP TRIGGER IF EXISTS delete_performance_after_artist;
 DELIMITER //
 CREATE TRIGGER delete_performance_after_artist
@@ -380,6 +380,7 @@ BEGIN
     END IF;
 END;
 //
+
 -- Performer ID Trigger
 DROP TRIGGER IF EXISTS check_performer;
 CREATE TRIGGER check_performer
@@ -402,6 +403,7 @@ BEGIN
    END IF;
 END //
 
+-- Check 3 consequtive years
 DROP TRIGGER IF EXISTS check_4th_year;
 CREATE TRIGGER check_4th_year
 BEFORE INSERT ON PERFORMANCES
@@ -438,6 +440,7 @@ BEGIN
     END IF;
 END//
 
+-- Check stage capacity
 DROP TRIGGER IF EXISTS check_stage_capacity;
 CREATE TRIGGER check_stage_capacity
 BEFORE INSERT ON TICKETS
@@ -493,7 +496,7 @@ SELECT
 
 FROM FESTIVAL_EVENTS fe
 JOIN STAGES s ON fe.stage_id = s.stage_id
-LEFT JOIN STAFF st ON st.event_id = fe.event_id  -- Left join because we need to see the event even if it has no staff
+LEFT JOIN STAFF st ON st.event_id = fe.event_id       -- Left join because we need to see the event even if it has no staff
 LEFT JOIN STAFF_CATEGORIES sc ON st.category_id = sc.staff_category_id
 
 GROUP BY fe.event_id, fe.stage_id, s.max_capacity; //
