@@ -313,6 +313,7 @@ BEGIN
     DELETE FROM PERFORMANCES
     WHERE performer_id = OLD.artist_id AND is_solo = 1;
 END;
+
 //
 
 DROP TRIGGER IF EXISTS delete_performance_after_band;
@@ -323,6 +324,7 @@ BEGIN
     DELETE FROM PERFORMANCES
     WHERE performer_id = OLD.band_id AND is_solo = 0;
 END;
+
 //
 
 -- Resale queue
@@ -349,6 +351,7 @@ BEGIN
     DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = matched_resale_id;
     END IF;
 END;
+
 //
 
 -- Check review eligibility
@@ -378,7 +381,8 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'You can only review performances you attended (ticket must be scanned).';
     END IF;
-END;
+END
+
 //
 
 -- Performer ID Trigger
@@ -401,7 +405,9 @@ BEGIN
            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching band for ensemble performance.';
        END IF;
    END IF;
-END //
+END
+
+//
 
 -- Check 3 consequtive years
 DROP TRIGGER IF EXISTS check_4th_year;
@@ -438,7 +444,9 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Performer cannot take part in the festival for more than 3 consecutive years.';
     END IF;
-END//
+END
+
+//
 
 -- Check stage capacity
 DROP TRIGGER IF EXISTS check_stage_capacity;
@@ -477,7 +485,10 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'No more VIP tickets available';
     END IF;
-END //
+END
+
+//
+
 DROP VIEW IF EXISTS staff_coverage_view;
 CREATE VIEW staff_coverage_view AS
 
@@ -499,6 +510,8 @@ JOIN STAGES s ON fe.stage_id = s.stage_id
 LEFT JOIN STAFF st ON st.event_id = fe.event_id       -- Left join because we need to see the event even if it has no staff
 LEFT JOIN STAFF_CATEGORIES sc ON st.category_id = sc.staff_category_id
 
-GROUP BY fe.event_id, fe.stage_id, s.max_capacity; //
+GROUP BY fe.event_id, fe.stage_id, s.max_capacity;
+
+//
 
 DELIMITER ;
