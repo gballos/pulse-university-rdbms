@@ -28,19 +28,6 @@ random.seed(42)
 faker.Faker.seed(42)
 
 
-# Check if any performer has performed at the same festival for 4 consecutive years
-def has_4_consecutive_years(years_set):
-    years = sorted(years_set)
-    streak = 1
-    for i in range(1, len(years)):
-        if years[i] == years[i - 1] + 1:
-            streak += 1
-            if streak >= 3:
-                return True
-        else:
-            streak = 1
-    return False
-
 # LOCATIONS
 def fake_locations(f):
     continents = ['Asia', 
