@@ -50,4 +50,4 @@ SELECT
     year2,
     appearance_count
 FROM consecutive_years
-ORDER BY music_type, year1;
+ORDER BY appearance_count DESC;

@@ -1,14 +1,15 @@
 USE pulse_uni_db;
 
+SET @tech_req = 5;
+
 SELECT
     fe.event_date,
-    SUM(CASE WHEN sc.technical_id IS NOT NULL THEN 1 ELSE 0 END) AS technical_count,
-    SUM(CASE WHEN sc.staff_category_desc = 'Security' THEN 1 ELSE 0 END) AS security_count,
-    SUM(CASE WHEN sc.staff_category_desc = 'Assistant' THEN 1 ELSE 0 END) AS assistant_count,
-    COUNT(*) AS total_count
-FROM STAFF s
-JOIN STAFF_CATEGORIES sc ON s.category_id = sc.staff_category_id
-JOIN FESTIVAL_EVENTS fe ON s.event_id = fe.event_id
-  
-GROUP BY fe.event_date, staff_group
+    SUM(@tech_req) AS technical_count,
+    SUM(CEIL(st.max_capacity * 0.05)) AS security_count,
+    SUM(CEIL(st.max_capacity * 0.02)) AS assistant_count,
+    SUM(@tech_req+CEIL(st.max_capacity * 0.05)+CEIL(st.max_capacity * 0.02)) as total_count
+FROM FESTIVAL_EVENTS fe
+JOIN STAGES st ON st.stage_id = fe.stage_id
+
+GROUP BY fe.event_date
 ORDER BY fe.event_date DESC;

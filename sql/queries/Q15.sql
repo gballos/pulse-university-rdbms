@@ -2,7 +2,7 @@ WITH solo_scores AS(
     SELECT
         r.visitor_id AS visitor_id,
         p.performer_id AS artist_id,
-        SUM(r.interpretation_rating+r.interpretation_rating) AS score
+        SUM(r.interpretation_rating+r.overall_impression_rating) AS score
     FROM REVIEWS r
     JOIN PERFORMANCES p on r.performance_id = p.performance_id
     WHERE p.is_solo = 1
@@ -12,7 +12,7 @@ band_scores AS(
     SELECT
         r.visitor_id AS visitor_id,
         ab.artist_id AS artist_id,
-        SUM(r.interpretation_rating+r.interpretation_rating) AS score
+        SUM(r.interpretation_rating+r.overall_impression_rating) AS score
     FROM REVIEWS r
     JOIN PERFORMANCES p on r.performance_id = p.performance_id
     JOIN ARTISTS_X_BANDS ab on ab.band_id = p.performer_id
