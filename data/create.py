@@ -10,10 +10,10 @@ N_TECHNICAL_SUPPLIES = 50
 N_EVENTS = 300
 N_ARTISTS = 300
 N_BANDS = 150
-N_PERFORMANCES = 1500
+N_PERFORMANCES = 2000
 N_STAFF = 2000
 N_VISITORS = 100
-N_TICKETS = 3000
+N_TICKETS = 4000
 N_REVIEWS = 300
 N_BUYERS = 200
 N_RESALE_TICKETS = 50
@@ -339,7 +339,11 @@ def fake_performances(f):
     def build_performance(performance_id):
         attempts = 0
         while attempts <= 200:
-            performance_type_id = random.randint(1, 3)
+            performance_type_id = random.choices(
+                population=[1, 2, 3],
+                weights=[10, 2, 1],
+                k=1
+            )[0]
             event_id = random.randint(1, N_EVENTS)
 
             # Handle performance_time with breaks
@@ -464,7 +468,11 @@ def fake_staff(f):
     fake = faker.Faker()
 
     def build_staff(staff_id):
-        category_id = random.randint(1, 10)
+        category_id = random.choices(
+                population=range(1, 11),
+                weights=[1, 1, 1, 1, 1, 1, 1, 1, 8, 8],
+                k=1
+            )[0]
         level_id = random.randint(1, 5)
         event_id = random.randint(1, N_EVENTS)
         first_name = fake.first_name()
