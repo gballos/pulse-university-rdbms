@@ -1,6 +1,10 @@
+-- DATABASE CREATION
+
 DROP DATABASE IF EXISTS pulse_uni_db;
 CREATE DATABASE pulse_uni_db;
 USE pulse_uni_db;
+
+-- TABLES
 
 DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
@@ -59,12 +63,12 @@ CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
 );
 
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
-CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
+CREATE TABLE FESTIVAL_EVENTS (  
 	event_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	festival_id INT UNSIGNED NOT NULL,
     stage_id INT UNSIGNED NOT NULL,
     event_date DATE,
-    duration INT,  -- again, in minutes?
+    duration INT,  
     image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_id) REFERENCES FESTIVALS(festival_id),
@@ -153,7 +157,7 @@ CREATE TABLE PERFORMANCES (
     performance_type_id INT UNSIGNED NOT NULL,
     event_id INT UNSIGNED NOT NULL,
     performance_time TIME,
-    duration INT CHECK(duration <= 180), -- duration in minutes
+    duration INT CHECK(duration <= 180),                           -- duration in minutes
     order_in_show INT,
     is_solo BOOLEAN,
     performer_id INT UNSIGNED,
@@ -174,7 +178,7 @@ DROP TABLE IF EXISTS STAFF_CATEGORIES;
 CREATE TABLE STAFF_CATEGORIES(
 	staff_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	staff_category_desc VARCHAR(20),
-	technical_id INT UNSIGNED DEFAULT NULL, -- for the employees that are technical, can be null for security/assistance
+	technical_id INT UNSIGNED DEFAULT NULL,                 -- NOT NULL for technical, NULL for security/assistance
 	PRIMARY KEY(staff_category_id),
 	FOREIGN KEY(technical_id) REFERENCES TECHNICAL_ROLES(technical_id)
 );
