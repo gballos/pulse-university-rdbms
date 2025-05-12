@@ -23,8 +23,10 @@ CREATE TABLE FESTIVALS (
     duration INT,
     location_id INT UNSIGNED,
     image VARCHAR(100), CHECK(image like 'https://%'),
+    festival_year INT GENERATED ALWAYS AS (YEAR(date_starting)) STORED,
     PRIMARY KEY(festival_id),
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
+    UNIQUE (festival_year),
     CHECK (date_ending > date_starting) 
 );
 

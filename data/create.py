@@ -23,6 +23,8 @@ event_perf_ids = []
 festival_dates = {}
 performer_festival_years = defaultdict(set)
 event_to_festival = {}
+used_years = set()
+
 random.seed(42)
 faker.Faker.seed(42)
 
@@ -70,16 +72,23 @@ def fake_festivals(f):
     fake = faker.Faker()
 
     def build_festivals(festival_id):
-        days = random.randint(1, 5)
+        while True:
+            days = random.randint(1, 5)
 
-        date_starting = fake.date_between(start_date='-50y', end_date='+3y')
-        date_ending = date_starting + datetime.timedelta(days)
-        duration = days
-        location_id = random.randint(1, N_LOCATIONS)
-        image = fake.image_url() 
-        festival_dates[festival_id] = (date_starting, date_ending)
+            date_starting = fake.date_between(start_date='-90y', end_date='+15y')
+            date_ending = date_starting + datetime.timedelta(days)
 
-        return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
+            if date_starting.year in used_years:
+                continue
+
+            used_years.add(date_starting.year)
+
+            duration = days
+            location_id = random.randint(1, N_LOCATIONS)
+            image = fake.image_url() 
+            festival_dates[festival_id] = (date_starting, date_ending)
+
+            return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
         
     festivals = (build_festivals(_) for _ in range(1, N_FESTIVALS+1))
 
