@@ -290,6 +290,8 @@ def fake_performance_types(f):
 def fake_performances(f):
     fake = faker.Faker()
 
+    event_last_end = {}  # Format: {event_id: (last_performance_time, last_duration)}
+
     def find_consecutive_subsets(numbers):
         sorted_nums = sorted(numbers)
         result = []
@@ -302,41 +304,54 @@ def fake_performances(f):
                 if len(current) > 1:
                     result.append(current)
                 current = [sorted_nums[i]]
-        
+
         if len(current) > 1:
             result.append(current)
 
         return result
+
     def has_consecutive_streak(years, length=4):
         for group in find_consecutive_subsets(years):
             if len(group) >= length:
                 return True
         return False
-    
+
     def build_performance(performance_id):
         attempts = 0
         while attempts <= 200:
             performance_type_id = random.randint(1, 3)
             event_id = random.randint(1, N_EVENTS)
-            performance_time = fake.time()
+
+            # Handle performance_time with breaks
+            if event_id in event_last_end:
+                last_time, last_duration = event_last_end[event_id]
+                hours, minutes, seconds = map(int, last_time.split(':'))
+                last_end_minutes = hours * 60 + minutes + last_duration
+                next_start_minutes = last_end_minutes + random.randint(5, 30)  # 5-30 minute break
+
+                next_start_h = next_start_minutes // 60
+                next_start_m = next_start_minutes % 60
+                performance_time = f"{next_start_h:02d}:{next_start_m:02d}:00"
+            else:
+                performance_time = fake.time()
+
             duration = random.randint(30, 180)
-            order_in_show = random.randint(1, 10)
+            order_in_show = len([e for e in event_perf_ids if e[0] == event_id]) + 1
             is_solo = random.choice([0, 1])
             performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
             image = fake.image_url()
 
             festival_id = event_to_festival.get(event_id)
             date, _ = festival_dates.get(festival_id)
-            curr_year = date.year
-            if not (festival_id or curr_year):
+            curr_year = date.year if date else None
+            if not (festival_id and curr_year):
                 continue
 
             key = (performer_id, is_solo)
             existing_years = set(performer_festival_years[key])
 
-            # Check for 3+ consecutive years
             new_years = existing_years.union({curr_year})
-            if has_consecutive_streak(new_years):  # your helper already does this check
+            if has_consecutive_streak(new_years):
                 attempts += 1
                 print(f"DEBUG: Performer {key} now has years: {sorted(performer_festival_years[key])}. Tried to add but failed {curr_year}")
                 continue
@@ -344,7 +359,8 @@ def fake_performances(f):
             # Acceptable – store and use
             performer_festival_years[key].add(curr_year)
 
-
+            # Record event end
+            event_last_end[event_id] = (performance_time, duration)
             event_perf_ids.append((event_id, performance_id))
 
             return (
@@ -353,7 +369,7 @@ def fake_performances(f):
             )
 
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
-    
+
     for performance in performances:
         f.write(performance)
 
