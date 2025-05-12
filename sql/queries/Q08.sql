@@ -1,5 +1,7 @@
 USE pulse_uni_db;
 
+SET @event_date = '2022-07-29';
+
 SELECT
     s.staff_id,
     s.first_name,
@@ -11,6 +13,6 @@ WHERE sc.technical_id IS NULL
     SELECT s2.staff_id
     FROM STAFF s2
     JOIN FESTIVAL_EVENTS fe ON s2.event_id = fe.event_id
-    WHERE fe.event_date = '2022-07-29'
+    WHERE fe.event_date = @event_date
 )
 ORDER BY s.last_name;

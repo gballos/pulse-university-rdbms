@@ -135,6 +135,7 @@ BEGIN
     END IF;
 END//
 
+DROP TRIGGER IF EXISTS check_stage_capacity;
 CREATE TRIGGER check_stage_capacity
 BEFORE INSERT ON TICKETS
 FOR EACH ROW
