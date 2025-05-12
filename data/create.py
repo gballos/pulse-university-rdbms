@@ -8,8 +8,8 @@ N_FESTIVALS = 100
 N_STAGES = 150
 N_TECHNICAL_SUPPLIES = 50
 N_EVENTS = 300
-N_ARTISTS = 250
-N_BANDS = 100
+N_ARTISTS = 300
+N_BANDS = 150
 N_PERFORMANCES = 1500
 N_STAFF = 2000
 N_VISITORS = 100
@@ -21,22 +21,10 @@ N_RESALE_TICKETS = 50
 scanned_visitor_ids = []
 event_perf_ids = []
 festival_dates = {}
+performer_festival_years = defaultdict(set)
+event_to_festival = {}
 random.seed(42)
 faker.Faker.seed(42)
-
-
-# Check if any performer has performed at the same festival for 4 consecutive years
-def has_4_consecutive_years(years_set):
-    years = sorted(years_set)
-    streak = 1
-    for i in range(1, len(years)):
-        if years[i] == years[i - 1] + 1:
-            streak += 1
-            if streak >= 3:
-                return True
-        else:
-            streak = 1
-    return False
 
 # LOCATIONS
 def fake_locations(f):
@@ -148,6 +136,7 @@ def fake_festival_events(f):
 
         date_starting, date_ending = festival_dates[festival_id]
         event_date = fake.date_between(start_date=date_starting, end_date=date_ending)
+        event_to_festival[event_id] = festival_id
 
         return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{event_id}', '{festival_id}', '{stage_id}', '{event_date}', '{duration}', '{image}');\n"
 
@@ -301,8 +290,32 @@ def fake_performance_types(f):
 def fake_performances(f):
     fake = faker.Faker()
 
+    def find_consecutive_subsets(numbers):
+        sorted_nums = sorted(numbers)
+        result = []
+        current = [sorted_nums[0]]
+
+        for i in range(1, len(sorted_nums)):
+            if sorted_nums[i] == sorted_nums[i - 1] + 1:
+                current.append(sorted_nums[i])
+            else:
+                if len(current) > 1:
+                    result.append(current)
+                current = [sorted_nums[i]]
+        
+        if len(current) > 1:
+            result.append(current)
+
+        return result
+    def has_consecutive_streak(years, length=4):
+        for group in find_consecutive_subsets(years):
+            if len(group) >= length:
+                return True
+        return False
+    
     def build_performance(performance_id):
-        while True:
+        attempts = 0
+        while attempts <= 200:
             performance_type_id = random.randint(1, 3)
             event_id = random.randint(1, N_EVENTS)
             performance_time = fake.time()
@@ -312,6 +325,26 @@ def fake_performances(f):
             performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
             image = fake.image_url()
 
+            festival_id = event_to_festival.get(event_id)
+            date, _ = festival_dates.get(festival_id)
+            curr_year = date.year
+            if not (festival_id or curr_year):
+                continue
+
+            key = (performer_id, is_solo)
+            existing_years = set(performer_festival_years[key])
+
+            # Check for 3+ consecutive years
+            new_years = existing_years.union({curr_year})
+            if has_consecutive_streak(new_years):  # your helper already does this check
+                attempts += 1
+                print(f"DEBUG: Performer {key} now has years: {sorted(performer_festival_years[key])}. Tried to add but failed {curr_year}")
+                continue
+
+            # Acceptable – store and use
+            performer_festival_years[key].add(curr_year)
+
+
             event_perf_ids.append((event_id, performance_id))
 
             return (
@@ -320,7 +353,7 @@ def fake_performances(f):
             )
 
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
-
+    
     for performance in performances:
         f.write(performance)
 
