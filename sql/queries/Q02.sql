@@ -1,7 +1,7 @@
 USE pulse_uni_db;
 
-SET @choose_year = 2022;
-SET @music_type = 'Rock';
+SET @choose_year = 2005;
+SET @music_type = 'Jazz';
 
 SELECT
     a.artist_id,
