@@ -20,10 +20,7 @@ N_RESALE_TICKETS = 50
 
 scanned_visitor_ids = []
 event_perf_ids = []
-festival_years = {}
-event_years = {}
-performer_years = defaultdict(set)
-
+festival_dates = {}
 random.seed(42)
 faker.Faker.seed(42)
 
@@ -76,12 +73,12 @@ def fake_festivals(f):
     def build_festivals(festival_id):
         days = random.randint(1, 5)
 
-        date_starting = datetime.datetime.strptime(fake.date(), "%Y-%m-%d").date()
+        date_starting = fake.date_between(start_date='-50y', end_date='+3y')
         date_ending = date_starting + datetime.timedelta(days)
         duration = days
         location_id = random.randint(1, N_LOCATIONS)
         image = fake.image_url() 
-        festival_years[festival_id] = date_starting.year
+        festival_dates[festival_id] = (date_starting, date_ending)
 
         return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
         
@@ -146,11 +143,12 @@ def fake_festival_events(f):
     def build_festivaL_events(event_id):
         festival_id = random.randint(1, N_FESTIVALS)
         stage_id = random.randint(1, N_STAGES) 
-        event_date = fake.date()
         duration = random.randint(60, 180)
         image = fake.image_url()
 
-        event_years[event_id] = festival_years[festival_id]
+        date_starting, date_ending = festival_dates[festival_id]
+        event_date = fake.date_between(start_date=date_starting, end_date=date_ending)
+
         return f"INSERT INTO FESTIVAL_EVENTS (event_id, festival_id, stage_id, event_date, duration, image) VALUES ('{event_id}', '{festival_id}', '{stage_id}', '{event_date}', '{duration}', '{image}');\n"
 
     festival_events = (build_festivaL_events(_) for _ in range(1, N_EVENTS+1)) 
@@ -243,8 +241,6 @@ def fake_bands(f):
     def build_band(band_id):
         name = fake.company()[:25]
         date_of_creation = fake.date_between(start_date='-50y', end_date='today')
-        music_type_id = random.randint(1, 10)
-        music_subtype_id = random.randint(1, 40)
         website = fake.url()
         instagram = "@" + fake.user_name()
         image = fake.image_url()
@@ -316,21 +312,6 @@ def fake_performances(f):
             performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
             image = fake.image_url()
 
-            # Absolute mapping: event_id → festival_id
-            year = event_years.get(event_id)
-            if not year:
-                continue
-
-            key = (performer_id, is_solo)
-            existing_years = performer_years[key]
-
-            # Temporarily add the new year and check for 4 consecutive years
-            new_years = existing_years.union({year})
-            if has_4_consecutive_years(new_years):
-                continue  # try again with different performer/event
-
-            # Valid → store and return
-            performer_years[key].add(year)
             event_perf_ids.append((event_id, performance_id))
 
             return (
