@@ -29,26 +29,37 @@ faker.Faker.seed(42)
 # LOCATIONS
 def fake_locations(f):
     continents = ['Asia', 
-    'Europe', 
-    'North America', 
-    'South America', 
-    'Africa', 
-    'Australia', 
-    'Antarctica']
+                  'Europe', 
+                  'North America', 
+                  'South America', 
+                  'Africa', 
+                  'Australia', 
+                  'Antarctica']
 
     fake = faker.Faker()
 
-    def build_locations(location_id):
-        address = fake.address()
-        city = fake.city()
-        country = fake.country()
-        continent = random.choice(continents)
-        longtitude = fake.longitude()
-        latitude = fake.latitude()
-        image = fake.image_url()
-        return f"INSERT INTO LOCATIONS (location_id, address, city, country, continent, longtitude, latitude, image) VALUES ('{location_id}', '{address}', '{city}', '{country}', '{continent}', '{longtitude}', '{latitude}', '{image}');\n"
+    def valid_text(value):
+        return len(value) <= 50 and "'" not in value
 
-    locations = (build_locations(_) for _ in range(1, N_LOCATIONS+1))
+    def build_locations(location_id):
+        while True:
+            address = fake.address().replace("'", "")
+            city = fake.city()
+            country = fake.country()
+
+            if not (valid_text(city) and valid_text(country)):
+                continue
+
+            continent = random.choice(continents)
+            longitude = fake.longitude()
+            latitude = fake.latitude()
+            image = fake.image_url()
+
+            return (f"INSERT INTO LOCATIONS (location_id, address, city, country, continent, "
+                    f"longtitude, latitude, image) VALUES ('{location_id}', '{address}', '{city}', "
+                    f"'{country}', '{continent}', '{longitude}', '{latitude}', '{image}');\n")
+
+    locations = (build_locations(_) for _ in range(1, N_LOCATIONS + 1))
 
     for location in locations:
         f.write(location)
