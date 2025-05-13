@@ -39,3 +39,14 @@
 - **Resale Queue**: When somebody tries to buy a ticket but they are sold out he is logged as a *buyer* that wants to buy ticket for that specific event. If somebody changes his mind about his ticket and his ticket is unscanned he can list his ticket for resale in the resale queue. The queue works in a *FIFO* way. We are constantly matching buyers and sellers based on their needs. If they match we remove them from the queue.
 - **Conscutive Festival Appearences**: A performer(band or artist) can not take part in the festival for more than 3 years in a row.
 - **Breaks between performances**: Between consecutive performances(in an event) there must be a 5 to 30 minute break. 
+
+## Assumptions (Beyond the assignment statement)
+- The support staff is non-technical, i.e., assistant and security.
+
+- We have implemented "order in show," so there is no need to check for time overlap, even if one event is in the morning and the other in the evening without any break in between, it's fine.
+
+- Durations in the database tables are in minutes.
+
+- We assume that one event reserves a stage for the entire given day regardless of event duration.
+
+- For Q12, we used the assumption that each event/stage requires 5 technical staff members.
