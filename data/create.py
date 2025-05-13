@@ -611,7 +611,7 @@ def fake_reviews(f):
             f.write(review)
             i += 1  
 
-with open("03_load.sql", "w") as f:
+with open("02_load.sql", "w") as f:
     fake_locations(f)
     fake_festivals(f)
     fake_stages(f)
