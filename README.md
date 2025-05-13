@@ -41,7 +41,9 @@
   
 - **Conscutive Festival Appearences**: A performer(band or artist) can not take part in the festival for more than 3 years in a row.
   
-- **Breaks between performances**: Between consecutive performances(in an event) there must be a 5 to 30 minute break. 
+- **Breaks between performances**: Between consecutive performances(in an event) there must be a 5 to 30 minute break.
+
+- **Images**: Each entity(that makes sense) is accompanied by a picture.
 
 ## Assumptions (Beyond the assignment statement)
 - The support staff is non-technical, i.e., assistant and security.
