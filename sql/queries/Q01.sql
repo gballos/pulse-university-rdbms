@@ -1,6 +1,7 @@
 USE pulse_uni_db;
 
 SELECT
+    f.festival_id,
     YEAR(f.date_starting) AS Festival_Year,
 
     -- Conditional SUMs for each payment method
@@ -20,5 +21,5 @@ JOIN FESTIVAL_EVENTS fe ON fe.festival_id = f.festival_id
 JOIN TICKETS t ON t.event_id = fe.event_id
 JOIN PAYMENT_METHODS pm ON t.payment_method_id = pm.payment_method_id
 
-GROUP BY YEAR(f.date_starting)
+GROUP BY f.festival_id, YEAR(f.date_starting)
 ORDER BY Festival_Year DESC;

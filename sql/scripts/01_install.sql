@@ -1,6 +1,10 @@
+-- DATABASE CREATION
+
 DROP DATABASE IF EXISTS pulse_uni_db;
 CREATE DATABASE pulse_uni_db;
 USE pulse_uni_db;
+
+-- TABLES
 
 DROP TABLE IF EXISTS LOCATIONS;
 CREATE TABLE LOCATIONS (
@@ -23,8 +27,11 @@ CREATE TABLE FESTIVALS (
     duration INT,
     location_id INT UNSIGNED,
     image VARCHAR(100), CHECK(image like 'https://%'),
+    festival_year INT GENERATED ALWAYS AS (YEAR(date_starting)) STORED,
     PRIMARY KEY(festival_id),
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
+    UNIQUE (festival_year),
+    UNIQUE (location_id),
     CHECK (date_ending > date_starting) 
 );
 
@@ -57,12 +64,12 @@ CREATE TABLE STAGES_X_TECHNICAL_SUPPLY(
 );
 
 DROP TABLE IF EXISTS FESTIVAL_EVENTS;
-CREATE TABLE FESTIVAL_EVENTS (  -- events is reserved
+CREATE TABLE FESTIVAL_EVENTS (  
 	event_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	festival_id INT UNSIGNED NOT NULL,
     stage_id INT UNSIGNED NOT NULL,
     event_date DATE,
-    duration INT,  -- again, in minutes?
+    duration INT,  
     image VARCHAR(100), CHECK(image like 'https://%'),
     PRIMARY KEY(event_id),
     FOREIGN KEY(festival_id) REFERENCES FESTIVALS(festival_id),
@@ -90,14 +97,10 @@ CREATE TABLE ARTISTS(
 	last_name VARCHAR(25),
 	nickname VARCHAR(25),
 	birthday DATE,
-	music_type_id INT UNSIGNED,
-	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(image like 'https://%'),
-	PRIMARY KEY(artist_id),
-	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
-	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+	PRIMARY KEY(artist_id)
 );	
 
 DROP TABLE IF EXISTS BANDS;
@@ -105,14 +108,10 @@ CREATE TABLE BANDS(
 	band_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name VARCHAR(25),
 	date_of_creation DATE,
-	music_type_id INT UNSIGNED,
-	music_subtype_id INT UNSIGNED,
 	website VARCHAR(100) CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
 	instagram VARCHAR(50),
     image VARCHAR(100), CHECK(website LIKE 'https://%' OR website LIKE 'http://%'),
-	PRIMARY KEY(band_id),
-	FOREIGN KEY(music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
-	FOREIGN KEY(music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+	PRIMARY KEY(band_id)
 );
 
 DROP TABLE IF EXISTS ARTISTS_X_BANDS; 
@@ -122,6 +121,28 @@ CREATE TABLE ARTISTS_X_BANDS(
 	PRIMARY KEY(artist_id, band_id),
 	FOREIGN KEY(artist_id) REFERENCES ARTISTS(artist_id),
 	FOREIGN KEY(band_id) REFERENCES BANDS(band_id)
+);
+
+DROP TABLE IF EXISTS ARTISTS_X_MUSIC;
+CREATE TABLE ARTISTS_X_MUSIC (
+    artist_id INT UNSIGNED NOT NULL,
+    music_type_id INT UNSIGNED,
+    music_subtype_id INT UNSIGNED,
+    PRIMARY KEY(artist_id, music_type_id, music_subtype_id),
+    FOREIGN KEY (artist_id) REFERENCES ARTISTS(artist_id),
+    FOREIGN KEY (music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+    FOREIGN KEY (music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
+);
+
+DROP TABLE IF EXISTS BANDS_X_MUSIC;
+CREATE TABLE BANDS_X_MUSIC (
+    band_id INT UNSIGNED NOT NULL,
+    music_type_id INT UNSIGNED,
+    music_subtype_id INT UNSIGNED,
+    PRIMARY KEY(band_id, music_type_id, music_subtype_id),
+    FOREIGN KEY (band_id) REFERENCES BANDS(band_id),
+    FOREIGN KEY (music_type_id) REFERENCES MUSIC_TYPES(music_type_id),
+    FOREIGN KEY (music_subtype_id) REFERENCES MUSIC_SUBTYPES(music_subtype_id)
 );
 
 DROP TABLE IF EXISTS PERFORMANCE_TYPES;
@@ -137,7 +158,7 @@ CREATE TABLE PERFORMANCES (
     performance_type_id INT UNSIGNED NOT NULL,
     event_id INT UNSIGNED NOT NULL,
     performance_time TIME,
-    duration INT CHECK(duration <= 180), -- duration in minutes
+    duration INT CHECK(duration <= 180),                           -- duration in minutes
     order_in_show INT,
     is_solo BOOLEAN,
     performer_id INT UNSIGNED,
@@ -158,7 +179,7 @@ DROP TABLE IF EXISTS STAFF_CATEGORIES;
 CREATE TABLE STAFF_CATEGORIES(
 	staff_category_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	staff_category_desc VARCHAR(20),
-	technical_id INT UNSIGNED DEFAULT NULL, -- for the employees that are technical, can be null for security/assistance
+	technical_id INT UNSIGNED DEFAULT NULL,                 -- NOT NULL for technical, NULL for security/assistance
 	PRIMARY KEY(staff_category_id),
 	FOREIGN KEY(technical_id) REFERENCES TECHNICAL_ROLES(technical_id)
 );
@@ -226,7 +247,8 @@ CREATE TABLE TICKETS(
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
-	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id)
+	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id),
+    UNIQUE (event_id, visitor_id)
 );
 
 DROP TABLE IF EXISTS LIKERT_RATINGS;
@@ -263,6 +285,7 @@ CREATE TABLE BUYERS(
 	event_id INT UNSIGNED,
 	ticket_type_id INT UNSIGNED,
 	ticket_id INT UNSIGNED,
+    requested_at DATETIME,
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
@@ -275,8 +298,383 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	ticket_id INT UNSIGNED,
 	event_id INT UNSIGNED,
 	ticket_type_id INT UNSIGNED,
+    listed_at DATETIME,
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
 	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id)
 );
+
+-- TRIGGERS 
+
+-- Delete trigger for performances
+DROP TRIGGER IF EXISTS delete_performance_after_artist;
+DELIMITER //
+CREATE TRIGGER delete_performance_after_artist
+AFTER DELETE ON ARTISTS
+FOR EACH ROW
+BEGIN
+    DELETE FROM PERFORMANCES
+    WHERE performer_id = OLD.artist_id AND is_solo = 1;
+END;
+
+//
+DROP TRIGGER IF EXISTS delete_performance_after_band;
+CREATE TRIGGER delete_performance_after_band
+AFTER DELETE ON BANDS
+FOR EACH ROW
+BEGIN
+    DELETE FROM PERFORMANCES
+    WHERE performer_id = OLD.band_id AND is_solo = 0;
+END;
+//
+
+-- Check review eligibility
+DROP TRIGGER IF EXISTS check_review_ticket_scanned;
+
+CREATE TRIGGER check_review_ticket_scanned
+BEFORE INSERT ON REVIEWS
+FOR EACH ROW
+BEGIN
+    DECLARE event_of_perf INT;
+    DECLARE ticket_scanned BOOL;
+
+    -- Get the event for the performance being reviewed
+    SELECT event_id INTO event_of_perf
+    FROM PERFORMANCES
+    WHERE performance_id = NEW.performance_id;
+
+    -- Check if visitor has a scanned ticket for that event
+    SELECT COUNT(*) > 0 INTO ticket_scanned
+    FROM TICKETS
+    WHERE visitor_id = NEW.visitor_id
+      AND event_id = event_of_perf
+      AND is_scanned = TRUE;
+
+    -- If not, block the review
+    IF NOT ticket_scanned THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You can only review performances you attended (ticket must be scanned).';
+    END IF;
+END
+
+//
+
+-- Performer ID Trigger
+DROP TRIGGER IF EXISTS check_performer;
+CREATE TRIGGER check_performer
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+   DECLARE artist_count INT;
+   DECLARE band_count INT;
+
+   IF NEW.is_solo = TRUE THEN
+       SELECT COUNT(*) INTO artist_count FROM ARTISTS WHERE artist_id = NEW.performer_id;
+       IF artist_count = 0 THEN
+           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching artist for solo performance.';
+       END IF;
+   ELSE
+       SELECT COUNT(*) INTO band_count FROM BANDS WHERE band_id = NEW.performer_id;
+       IF band_count = 0 THEN
+           SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'No matching band for ensemble performance.';
+       END IF;
+   END IF;
+END
+//
+
+-- Check 3 consecutive years
+DROP TRIGGER IF EXISTS check_4th_year;
+CREATE TRIGGER check_4th_year
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+    DECLARE performer_year INT;
+    DECLARE prev_years INT;
+
+    -- Get the year of the current performance
+    SELECT YEAR(event_date) INTO performer_year
+    FROM FESTIVAL_EVENTS
+    WHERE event_id = NEW.event_id;
+
+    -- Count how many times this performer performed in the 3 years before this one
+    IF NEW.is_solo = TRUE THEN
+        SELECT COUNT(DISTINCT YEAR(fe.event_date)) INTO prev_years
+        FROM PERFORMANCES p
+        JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
+        WHERE p.performer_id = NEW.performer_id
+          AND p.is_solo = 1
+          AND YEAR(fe.event_date) BETWEEN performer_year - 3 AND performer_year - 1;
+    ELSE
+        SELECT COUNT(DISTINCT YEAR(fe.event_date)) INTO prev_years
+        FROM PERFORMANCES p
+        JOIN FESTIVAL_EVENTS fe ON p.event_id = fe.event_id
+        WHERE p.performer_id = NEW.performer_id
+          AND p.is_solo = 0
+          AND YEAR(fe.event_date) BETWEEN performer_year - 3 AND performer_year - 1;
+    END IF;
+
+    IF prev_years = 3 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Performer cannot take part in the festival for more than 3 consecutive years.';
+    END IF;
+END
+
+//
+
+-- Check stage capacity
+DROP TRIGGER IF EXISTS check_stage_capacity;
+CREATE TRIGGER check_stage_capacity
+BEFORE INSERT ON TICKETS
+FOR EACH ROW
+BEGIN
+    DECLARE cap INT;
+    DECLARE ticket_count INT;
+    DECLARE vip_count INT;
+    DECLARE ticket_type_name VARCHAR(20);
+
+    SELECT ticket_type INTO ticket_type_name
+    FROM TICKET_TYPES
+    WHERE ticket_type_id = NEW.ticket_type_id;
+
+    SELECT s.max_capacity INTO cap
+    FROM FESTIVAL_EVENTS fe
+    JOIN STAGES s ON s.stage_id = fe.event_id
+    WHERE NEW.event_id = fe.event_id;
+
+    SELECT COUNT(*) INTO ticket_count
+    FROM TICKETS
+    WHERE event_id = NEW.event_id;
+
+    SELECT COUNT(*) INTO vip_count
+    FROM TICKETS
+    WHERE event_id = NEW.event_id AND ticket_type_name = 'VIP';
+
+    IF ticket_count >= cap THEN
+        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
+        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Exceeded stage capacity. No more tickets available. Added buyer to queue';
+    END IF;
+
+    IF vip_count >= 0.1*cap THEN
+        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
+        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No more VIP tickets available. Added buyer to queue';
+    END IF;
+END
+
+-- Resale Queue | Matching
+//
+DROP PROCEDURE IF EXISTS match_resale_queue;
+CREATE PROCEDURE match_resale_queue()
+BEGIN
+    DECLARE b_id INT;
+    DECLARE b_event INT;
+    DECLARE b_ticket INT;
+    DECLARE b_ticket_type INT;
+    DECLARE r_id INT;
+    DECLARE r_ticket INT;
+
+    match_loop: LOOP
+        SELECT buyer_id, event_id, ticket_type_id, ticket_id
+        INTO b_id, b_event, b_ticket_type, b_ticket
+        FROM BUYERS
+        ORDER BY requested_at
+        LIMIT 1;
+
+        -- No buyers left
+        IF b_id IS NULL THEN
+            LEAVE match_loop;
+        END IF;
+
+        -- Check if requested by id:
+        IF b_ticket IS NOT NULL THEN
+            SELECT ticket_for_resale_id
+            INTO r_id
+            FROM TICKETS_FOR_RESALE
+            WHERE ticket_id = b_ticket
+            ORDER BY listed_at
+            LIMIT 1;
+
+            IF r_id IS NOT NULL THEN
+                DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = r_id;
+                DELETE FROM BUYERS WHERE buyer_id = b_id;
+                ITERATE match_loop;
+            END IF;
+        END IF;
+
+        -- Otherwise match by event + type
+        SELECT ticket_for_resale_id, ticket_id
+        INTO r_id, r_ticket
+        FROM TICKETS_FOR_RESALE
+        WHERE event_id = b_event AND ticket_type_id = b_ticket_type
+        ORDER BY listed_at
+        LIMIT 1;
+
+        IF r_id IS NOT NULL THEN
+          DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = r_id;
+          DELETE FROM BUYERS WHERE buyer_id = b_id;
+          ITERATE match_loop;
+        END IF;
+
+        -- If here no match found
+        LEAVE match_loop;
+    END LOOP match_loop;
+END //
+
+-- Run match for new entries
+//
+DROP TRIGGER IF EXISTS after_ticket_resale_insert;
+CREATE TRIGGER after_ticket_resale_insert
+AFTER INSERT ON TICKETS_FOR_RESALE
+FOR EACH ROW
+BEGIN
+    DECLARE not_valid BOOL;
+
+    SELECT t.is_scanned INTO not_valid
+    FROM TICKETS t
+    WHERE (NEW.ticket_id = t.ticket_id);
+
+    IF not_valid = 0 THEN
+        CALL match_resale_queue();
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You cannot list scanned ticket.';
+    END IF;
+END;
+//
+DROP TRIGGER IF EXISTS after_buyer_insert;
+CREATE TRIGGER after_buyer_insert
+AFTER INSERT ON BUYERS
+FOR EACH ROW
+BEGIN
+    CALL match_resale_queue();
+END;
+//
+
+-- trigger to check if an event is within the date range of the festival
+DROP TRIGGER IF EXISTS event_dates_in_festival;
+CREATE TRIGGER event_dates_in_festival
+BEFORE INSERT ON FESTIVAL_EVENTS
+FOR EACH ROW
+BEGIN
+    DECLARE fest_start_date DATE;
+    DECLARE fest_end_date DATE;
+    
+    SELECT date_starting, date_ending 
+        INTO fest_start_date, fest_end_date
+        FROM FESTIVALS 
+    WHERE festival_id = NEW.festival_id;
+    
+    IF NEW.event_date < fest_start_date OR NEW.event_date > fest_end_date THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Event date must be between festival start and end dates';
+    END IF;
+END
+//
+
+-- create trigger to check that break is within range of 5-30 mins
+DROP TRIGGER IF EXISTS check_break_range;
+//
+CREATE TRIGGER check_break_range
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+    DECLARE prev_end_seconds INT;
+    DECLARE current_start_seconds INT;
+
+    -- Convert new performance time to seconds since midnight
+    SET current_start_seconds = TIME_TO_SEC(NEW.performance_time);
+
+    -- Get the most recent performance's end time (not just previous order_in_show)
+    SELECT TIME_TO_SEC(ADDTIME(performance_time, SEC_TO_TIME(duration * 60)))
+    INTO prev_end_seconds
+    FROM PERFORMANCES
+    WHERE event_id = NEW.event_id
+    ORDER BY performance_time DESC
+    LIMIT 1;
+
+    -- Only check if there was a previous performance
+    IF prev_end_seconds IS NOT NULL THEN
+        SET @time_diff_minutes = (current_start_seconds - prev_end_seconds) / 60;
+
+        IF @time_diff_minutes < 5 OR @time_diff_minutes > 30 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Break must be 5-30 minutes.';
+        END IF;
+    END IF;
+END
+//
+DROP TRIGGER IF EXISTS block_fest_delete;
+CREATE TRIGGER block_fest_delete BEFORE DELETE ON FESTIVALS
+FOR EACH ROW
+BEGIN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'FESTIVAL delete cancelled';
+END
+//
+DROP TRIGGER IF EXISTS block_event_delete;
+CREATE TRIGGER block_event_delete BEFORE DELETE ON FESTIVAL_EVENTS
+FOR EACH ROW
+BEGIN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'FESTIVAL_EVENTS delete cancelled';
+END
+//
+DROP VIEW IF EXISTS staff_coverage_view;
+CREATE VIEW staff_coverage_view AS
+
+SELECT
+  fe.event_id,
+  fe.stage_id,
+  s.max_capacity,
+
+  SUM(IF(sc.technical_id IS NOT NULL, 1, 0)) AS technical_assigned,
+  SUM(IF(sc.staff_category_desc = 'Security', 1, 0))  AS security_assigned,
+  SUM(IF(sc.staff_category_desc = 'Assistant', 1, 0)) AS general_assigned,
+
+
+  CEIL(s.max_capacity * 0.05)                         AS security_required,
+  CEIL(s.max_capacity * 0.02)                         AS general_required
+
+FROM FESTIVAL_EVENTS fe
+JOIN STAGES s ON fe.stage_id = s.stage_id
+LEFT JOIN STAFF st ON st.event_id = fe.event_id       -- Left join because we need to see the event even if it has no staff
+LEFT JOIN STAFF_CATEGORIES sc ON st.category_id = sc.staff_category_id
+
+GROUP BY fe.event_id, fe.stage_id, s.max_capacity;
+
+//
+
+DELIMITER ;
+
+-- indexes for the most common joins / foreign keys
+
+-- festival_events
+CREATE INDEX idx_events_festivals ON FESTIVAL_EVENTS(festival_id);
+CREATE INDEX idx_events_performances_events ON PERFORMANCES(event_id);
+CREATE INDEX idx_events_tickets ON TICKETS(event_id);
+CREATE INDEX idx_events_staff ON STAFF(event_id);
+
+-- artist / band relationships
+CREATE INDEX idx_ab_artist ON ARTISTS_X_BANDS(artist_id);
+CREATE INDEX idx_ab_band ON ARTISTS_X_BANDS(band_id);
+
+-- composite indexes 
+
+-- for queries 2, 3, 4, 10, 15  /  require the connection both events and performers
+CREATE INDEX idx_events_performers ON PERFORMANCES(event_id, performer_id);
+
+-- for queries 6, 9, 15  /  require both visitors and events 
+-- useful for the big number of tickets
+CREATE INDEX idx_tickets_visitors_events ON TICKETS(visitor_id, event_id);
+
+-- performance-review related queries 4, 15
+CREATE INDEX idx_performances_performers ON PERFORMANCES(performance_id, performer_id);
+
+-- review related queries 4, 6, 9, 15
+CREATE INDEX idx_reviews_performance ON REVIEWS(performance_id);
+CREATE INDEX idx_reviews_visitors_performances ON REVIEWS(visitor_id, performance_id);
+
+-- staff queries 7, 12   /   filter event & categories
+CREATE INDEX idx_staff_event_level ON STAFF(event_id, category_id);

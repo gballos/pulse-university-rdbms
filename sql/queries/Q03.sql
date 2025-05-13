@@ -6,7 +6,9 @@ SELECT
     a.last_name,
     f.festival_id,
     COUNT(*) AS warmup_count
+    
 FROM (
+    -- For solo artists
     SELECT
         p.performer_id AS artist_id,
         fe.festival_id
@@ -17,6 +19,7 @@ FROM (
 
     UNION ALL
 
+    -- For bands
     SELECT
         ab.artist_id,
         fe.festival_id
@@ -28,6 +31,7 @@ FROM (
 ) AS artist_festival_warmups
 JOIN ARTISTS a ON a.artist_id = artist_festival_warmups.artist_id
 JOIN FESTIVALS f ON f.festival_id = artist_festival_warmups.festival_id
+    
 GROUP BY a.artist_id, f.festival_id
 HAVING COUNT(*) > 2
 ORDER BY warmup_count DESC;
