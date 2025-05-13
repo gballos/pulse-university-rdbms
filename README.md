@@ -1,6 +1,6 @@
-## Pulse University RDBMS
+# Pulse University RDBMS
 
-# ***MANUAL:***
+## How to use the app
 
 **0.  If you are on Windows** 
 
