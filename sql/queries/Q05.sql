@@ -4,7 +4,7 @@ SELECT
     a.artist_id,
     a.first_name,
     a.last_name,
-    a.birthday,
+    TIMESTAMPDIFF(YEAR, a.birthday, CURDATE()) AS age,
     COUNT(DISTINCT artist_festivals.festival_id) AS festival_count
     
 FROM ARTISTS a
