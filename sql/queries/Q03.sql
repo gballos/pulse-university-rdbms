@@ -29,7 +29,6 @@ FROM (
     JOIN ARTISTS_X_BANDS ab ON ab.band_id = p.performer_id
     WHERE p.is_solo = 0 AND pt.performance_type = 'Warm Up'
 ) AS artist_festival_warmups
-    
 JOIN ARTISTS a ON a.artist_id = artist_festival_warmups.artist_id
 JOIN FESTIVALS f ON f.festival_id = artist_festival_warmups.festival_id
     
