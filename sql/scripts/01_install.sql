@@ -542,6 +542,60 @@ BEGIN
 END;
 //
 
+-- trigger to check if an event is within the date range of the festival
+DROP TRIGGER IF EXISTS event_dates_in_festival;
+CREATE TRIGGER event_dates_in_festival
+BEFORE INSERT ON FESTIVAL_EVENTS
+FOR EACH ROW
+BEGIN
+    DECLARE fest_start_date DATE;
+    DECLARE fest_end_date DATE;
+    
+    SELECT date_starting, date_ending 
+        INTO fest_start_date, fest_end_date
+        FROM FESTIVALS 
+    WHERE festival_id = NEW.festival_id;
+    
+    IF NEW.event_date < fest_start_date OR NEW.event_date > fest_end_date THEN
+        SIGNAL SQLSTATE '45000' 
+        SET MESSAGE_TEXT = 'Event date must be between festival start and end dates';
+    END IF;
+END
+//
+
+-- create trigger to check that break is within range of 5-30 mins
+DROP TRIGGER IF EXISTS check_break_range;
+//
+CREATE TRIGGER check_break_range
+BEFORE INSERT ON PERFORMANCES
+FOR EACH ROW
+BEGIN
+    DECLARE show_time INT;
+    DECLARE prev_show_time TIME;
+    DECLARE prev_duration_min INT;
+    DECLARE prev_show_total INT;
+    DECLARE time_difference INT;
+
+    SET show_time = TIME_TO_SEC(NEW.performance_time);
+
+    SELECT performance_time, duration INTO prev_show_time, prev_duration_min
+    FROM PERFORMANCES 
+    WHERE event_id = NEW.event_id 
+        AND order_in_show = (NEW.order_in_show - 1);  
+   
+    IF prev_show_time IS NOT NULL THEN
+        SET prev_show_total = TIME_TO_SEC(ADDTIME(prev_show_time, SEC_TO_TIME(prev_duration_min * 60)));
+
+        SET time_difference = (show_time - prev_show_total) / 60;  -- convert to minutes
+
+        IF time_difference < 5 OR time_difference > 30 THEN
+            SIGNAL SQLSTATE '45000' 
+            SET MESSAGE_TEXT = 'Break between performances must be between 5 and 30 minutes';
+        END IF;
+    END IF;
+END //
+
+
 DROP VIEW IF EXISTS staff_coverage_view;
 CREATE VIEW staff_coverage_view AS
 
