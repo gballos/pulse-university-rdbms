@@ -12,7 +12,7 @@
 
 **2.  Build the docker with `./build.ps1` on Windows and  `./build.sh` on Linux**
 
-  This should initialize MySQL continer and the database using the sql scripts in `pulse-universisty-rdbms/sql`
+  This should initialize MySQL container and the database using the sql scripts in `pulse-universisty-rdbms/sql/scripts`. Make sure you have Dokcer Desktop active.
 
 **3.  Connect MySQL Workbench**
 
