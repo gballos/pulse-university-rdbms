@@ -1,6 +1,6 @@
 # Pulse University RDBMS
 
-#***MANUAL:***
+# ***MANUAL:***
 
 **0.  If you are on Windows** 
 
