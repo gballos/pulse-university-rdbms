@@ -23,6 +23,8 @@ performer_festival_years = defaultdict(set)
 event_to_festival = {}
 used_years = set()
 event_last_end = {}
+visitor_event_ids = []
+locations_ids = set()
 
 random.seed(42)
 faker.Faker.seed(42)
@@ -76,15 +78,18 @@ def fake_festivals(f):
 
             date_starting = fake.date_between(start_date='-90y', end_date='+15y')
             date_ending = date_starting + datetime.timedelta(days)
+            duration = days
+            location_id = random.randint(1, N_LOCATIONS)
+            image = fake.image_url()
 
             if date_starting.year in used_years:
+                continue 
+            
+            if location_id in locations_ids:
                 continue
 
             used_years.add(date_starting.year)
-
-            duration = days
-            location_id = random.randint(1, N_LOCATIONS)
-            image = fake.image_url() 
+            locations_ids.add(location_id)
             festival_dates[festival_id] = (date_starting, date_ending)
 
             return f"INSERT INTO FESTIVALS (festival_id, date_starting, date_ending, duration, location_id, image) VALUES ('{festival_id}', '{date_starting}', '{date_ending}', '{duration}', '{location_id}', '{image}');\n"
@@ -552,19 +557,25 @@ def fake_tickets(f):
     fake = faker.Faker()
 
     def build_ticket(ticket_id):
-        event_id = random.randint(1, N_EVENTS)
-        visitor_id = random.randint(1, N_VISITORS)
-        ticket_type_id = random.randint(1, 3)
-        payment_method_id = random.randint(1, 7)
-        ean_code = ''.join(str(random.randint(0, 9)) for _ in range(13))
-        is_scanned = random.choice([0, 1])
-        date_bought = fake.date_between(start_date='-1y', end_date='today')
-        cost = random.randint(20, 200)
+        while True:
+            event_id = random.randint(1, N_EVENTS)
+            visitor_id = random.randint(1, N_VISITORS)
+            ticket_type_id = random.randint(1, 3)
+            payment_method_id = random.randint(1, 7)
+            ean_code = ''.join(str(random.randint(0, 9)) for _ in range(13))
+            is_scanned = random.choice([0, 1])
+            date_bought = fake.date_between(start_date='-1y', end_date='today')
+            cost = random.randint(20, 200)
 
-        if is_scanned:
-            scanned_visitor_ids.append((visitor_id,event_id))
+            if (visitor_id, event_id) in visitor_event_ids:
+                continue
 
-        return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{ticket_id}', '{event_id}', '{visitor_id}', '{ticket_type_id}', '{payment_method_id}', '{ean_code}', '{is_scanned}', '{date_bought}', '{cost}');\n"
+            if is_scanned:
+                scanned_visitor_ids.append((visitor_id,event_id))
+
+            visitor_event_ids.append((visitor_id, event_id))
+
+            return f"INSERT INTO TICKETS (ticket_id, event_id, visitor_id, ticket_type_id, payment_method_id, ean_code, is_scanned, date_bought, cost) VALUES ('{ticket_id}', '{event_id}', '{visitor_id}', '{ticket_type_id}', '{payment_method_id}', '{ean_code}', '{is_scanned}', '{date_bought}', '{cost}');\n"
 
     tickets = (build_ticket(i) for i in range(1, N_TICKETS + 1))
 

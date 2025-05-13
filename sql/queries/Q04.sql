@@ -1,6 +1,6 @@
 USE pulse_uni_db;
 
-SET @artist_id = 42;
+SET @artist_id = 500;
 
 -- simple query 
 -- EXPLAIN ANALYZE

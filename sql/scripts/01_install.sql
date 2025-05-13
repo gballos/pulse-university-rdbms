@@ -31,6 +31,7 @@ CREATE TABLE FESTIVALS (
     PRIMARY KEY(festival_id),
     FOREIGN KEY(location_id) REFERENCES LOCATIONS(location_id),
     UNIQUE (festival_year),
+    UNIQUE (location_id),
     CHECK (date_ending > date_starting) 
 );
 
@@ -246,7 +247,8 @@ CREATE TABLE TICKETS(
     FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
 	FOREIGN KEY(visitor_id) REFERENCES VISITORS(visitor_id),
-	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id)
+	FOREIGN KEY(payment_method_id) REFERENCES PAYMENT_METHODS(payment_method_id),
+    UNIQUE (event_id, visitor_id)
 );
 
 DROP TABLE IF EXISTS LIKERT_RATINGS;
@@ -529,7 +531,18 @@ CREATE TRIGGER after_ticket_resale_insert
 AFTER INSERT ON TICKETS_FOR_RESALE
 FOR EACH ROW
 BEGIN
-    CALL match_resale_queue();
+    DECLARE not_valid BOOL;
+
+    SELECT t.is_scanned INTO not_valid
+    FROM TICKETS t
+    WHERE (NEW.ticket_id = t.ticket_id);
+
+    IF not_valid = 0 THEN
+        CALL match_resale_queue();
+    ELSE
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'You cannot list scanned ticket.';
+    END IF;
 END;
 //
 DROP TRIGGER IF EXISTS after_buyer_insert;
@@ -556,7 +569,7 @@ BEGIN
     WHERE festival_id = NEW.festival_id;
     
     IF NEW.event_date < fest_start_date OR NEW.event_date > fest_end_date THEN
-        SIGNAL SQLSTATE '45000' 
+        SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Event date must be between festival start and end dates';
     END IF;
 END
@@ -594,8 +607,20 @@ BEGIN
     END IF;
 END
 //
-
-
+DROP TRIGGER IF EXISTS block_fest_delete;
+CREATE TRIGGER block_fest_delete BEFORE DELETE ON FESTIVALS
+FOR EACH ROW
+BEGIN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'FESTIVAL delete cancelled';
+END
+//
+DROP TRIGGER IF EXISTS block_event_delete;
+CREATE TRIGGER block_event_delete BEFORE DELETE ON FESTIVAL_EVENTS
+FOR EACH ROW
+BEGIN
+  SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'FESTIVAL_EVENTS delete cancelled';
+END
+//
 DROP VIEW IF EXISTS staff_coverage_view;
 CREATE VIEW staff_coverage_view AS
 
