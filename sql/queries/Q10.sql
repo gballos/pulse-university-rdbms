@@ -26,6 +26,6 @@ FROM artist_types at1
 JOIN artist_types at2 ON at2.artist_id = at1.artist_id AND at1.music_type < at2.music_type
 JOIN festival_artists fa on at1.artist_id = fa.artist_id
 GROUP BY fa.festival_id, type1, type2
-ORDER BY pair_count, type1
+ORDER BY pair_count DESC
 LIMIT 3
 
