@@ -379,7 +379,6 @@ BEGIN
        END IF;
    END IF;
 END
-
 //
 
 -- Check 3 consecutive years
@@ -570,30 +569,31 @@ CREATE TRIGGER check_break_range
 BEFORE INSERT ON PERFORMANCES
 FOR EACH ROW
 BEGIN
-    DECLARE show_time INT;
-    DECLARE prev_show_time TIME;
-    DECLARE prev_duration_min INT;
-    DECLARE prev_show_total INT;
-    DECLARE time_difference INT;
+    DECLARE prev_end_seconds INT;
+    DECLARE current_start_seconds INT;
 
-    SET show_time = TIME_TO_SEC(NEW.performance_time);
+    -- Convert new performance time to seconds since midnight
+    SET current_start_seconds = TIME_TO_SEC(NEW.performance_time);
 
-    SELECT performance_time, duration INTO prev_show_time, prev_duration_min
-    FROM PERFORMANCES 
-    WHERE event_id = NEW.event_id 
-        AND order_in_show = (NEW.order_in_show - 1);  
-   
-    IF prev_show_time IS NOT NULL THEN
-        SET prev_show_total = TIME_TO_SEC(ADDTIME(prev_show_time, SEC_TO_TIME(prev_duration_min * 60)));
+    -- Get the most recent performance's end time (not just previous order_in_show)
+    SELECT TIME_TO_SEC(ADDTIME(performance_time, SEC_TO_TIME(duration * 60)))
+    INTO prev_end_seconds
+    FROM PERFORMANCES
+    WHERE event_id = NEW.event_id
+    ORDER BY performance_time DESC
+    LIMIT 1;
 
-        SET time_difference = (show_time - prev_show_total) / 60;  -- convert to minutes
+    -- Only check if there was a previous performance
+    IF prev_end_seconds IS NOT NULL THEN
+        SET @time_diff_minutes = (current_start_seconds - prev_end_seconds) / 60;
 
-        IF time_difference < 5 OR time_difference > 30 THEN
-            SIGNAL SQLSTATE '45000' 
-            SET MESSAGE_TEXT = 'Break between performances must be between 5 and 30 minutes';
+        IF @time_diff_minutes < 5 OR @time_diff_minutes > 30 THEN
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'Break must be 5-30 minutes.';
         END IF;
     END IF;
-END //
+END
+//
 
 
 DROP VIEW IF EXISTS staff_coverage_view;

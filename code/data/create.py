@@ -22,6 +22,7 @@ festival_dates = {}
 performer_festival_years = defaultdict(set)
 event_to_festival = {}
 used_years = set()
+event_last_end = {}
 
 random.seed(42)
 faker.Faker.seed(42)
@@ -308,8 +309,6 @@ def fake_performance_types(f):
 def fake_performances(f):
     fake = faker.Faker()
 
-    event_last_end = {}  # Format: {event_id: (last_performance_time, last_duration)}
-
     def find_consecutive_subsets(numbers):
         sorted_nums = sorted(numbers)
         result = []
@@ -336,54 +335,63 @@ def fake_performances(f):
 
     def build_performance(performance_id):
         attempts = 0
-        while attempts <= 200:
+        while True:
             performance_type_id = random.choices(
                 population=[1, 2, 3],
                 weights=[10, 2, 1],
                 k=1
             )[0]
             event_id = random.randint(1, N_EVENTS)
-
-            # Handle performance_time with breaks
-            if event_id in event_last_end:
-                last_time, last_duration = event_last_end[event_id]
-                hours, minutes, seconds = map(int, last_time.split(':'))
-                last_end_minutes = hours * 60 + minutes + last_duration
-                next_start_minutes = last_end_minutes + random.randint(5, 30)  # 5-30 minute break
-
-                next_start_h = next_start_minutes // 60
-                next_start_m = next_start_minutes % 60
-                performance_time = f"{next_start_h:02d}:{next_start_m:02d}:00"
+            
+            # Get last performance end time for this event
+            last_end_minutes = event_last_end.get(event_id)
+            
+            if last_end_minutes is not None:
+                # Calculate next start time with 5-30 minute break
+                next_start_minutes = last_end_minutes + random.randint(5, 30)
             else:
-                performance_time = fake.time()
-
+                # First performance can start anytime
+                next_start_minutes = random.randint(0, 24 * 60 - 1)
+            
+            # Convert to time string
+            next_start_h = next_start_minutes // 60
+            next_start_m = next_start_minutes % 60
+            performance_time = f"{next_start_h:02d}:{next_start_m:02d}:00"
+            
             duration = random.randint(30, 180)
-            order_in_show = len([e for e in event_perf_ids if e[0] == event_id]) + 1
-            is_solo = random.choice([0, 1])
-            performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
-            image = fake.image_url()
+            end_time_minutes = next_start_minutes + duration
+            
+            # Check day boundaries
+            if end_time_minutes >= 24 * 60:
+                attempts += 1
+                continue
 
+            # Festival ID and date
             festival_id = event_to_festival.get(event_id)
             date, _ = festival_dates.get(festival_id)
             curr_year = date.year if date else None
             if not (festival_id and curr_year):
+                attempts += 1
                 continue
 
+            # Performer logic
+            is_solo = random.choice([0, 1])
+            performer_id = random.randint(1, N_ARTISTS if is_solo else N_BANDS)
             key = (performer_id, is_solo)
             existing_years = set(performer_festival_years[key])
-
             new_years = existing_years.union({curr_year})
+
             if has_consecutive_streak(new_years):
                 attempts += 1
                 print(f"DEBUG: Performer {key} now has years: {sorted(performer_festival_years[key])}. Tried to add but failed {curr_year}")
                 continue
 
-            # Acceptable – store and use
+            # Passed all checks
             performer_festival_years[key].add(curr_year)
-
-            # Record event end
-            event_last_end[event_id] = (performance_time, duration)
+            order_in_show = len([e for e in event_perf_ids if e[0] == event_id]) + 1
+            image = fake.image_url()
             event_perf_ids.append((event_id, performance_id))
+            event_last_end[event_id] = end_time_minutes
 
             return (
                 f"INSERT INTO PERFORMANCES (performance_id, performance_type_id, event_id, performance_time, duration, order_in_show, is_solo, performer_id, image) "
@@ -393,8 +401,8 @@ def fake_performances(f):
     performances = (build_performance(i) for i in range(1, N_PERFORMANCES + 1))
 
     for performance in performances:
-        f.write(performance)
-
+        if performance:  # Only write if not None
+            f.write(performance)
 
 # TECHNICAL_ROLES
 def fake_technical_roles(f):
