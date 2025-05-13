@@ -18,6 +18,7 @@ JOIN ARTISTS_X_MUSIC am ON am.artist_id = a.artist_id
 JOIN MUSIC_TYPES mt ON mt.music_type_id = am.music_type_id
 
 LEFT JOIN (
+    -- For solo artists
     SELECT DISTINCT p.performer_id AS artist_id
     FROM PERFORMANCES p
     JOIN FESTIVAL_EVENTS fe ON fe.event_id = p.event_id
@@ -26,6 +27,7 @@ LEFT JOIN (
 
     UNION
 
+    -- For bands 
     SELECT DISTINCT ab.artist_id
     FROM PERFORMANCES p
     JOIN FESTIVAL_EVENTS fe ON fe.event_id = p.event_id
