@@ -283,6 +283,7 @@ CREATE TABLE BUYERS(
 	event_id INT UNSIGNED,
 	ticket_type_id INT UNSIGNED,
 	ticket_id INT UNSIGNED,
+    requested_at DATETIME,
 	PRIMARY KEY(buyer_id),
 	FOREIGN KEY(event_id) REFERENCES FESTIVAL_EVENTS(event_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
@@ -295,6 +296,7 @@ CREATE TABLE TICKETS_FOR_RESALE(
 	ticket_id INT UNSIGNED,
 	event_id INT UNSIGNED,
 	ticket_type_id INT UNSIGNED,
+    listed_at DATETIME,
 	PRIMARY KEY(ticket_for_resale_id),
 	FOREIGN KEY(ticket_id) REFERENCES TICKETS(ticket_id),
 	FOREIGN KEY(ticket_type_id) REFERENCES TICKET_TYPES(ticket_type_id),
@@ -353,30 +355,6 @@ BEGIN
 END;
 
 //
-DROP TRIGGER IF EXISTS redirect_to_queue
-CREATE TRIGGER redirect_to_queue
-BEFORE INSERT ON TICKETS
-FOR EACH ROW
-BEGIN
-    DECLARE total_tickets INT;
-    DECLARE sold_tickets INT;
-
-    SELECT COUNT(*) INTO total_tickets
-    FROM TICKETS
-    JOIN 
-    WHERE event_id = NEW.event_id AND ticket_type_id = NEW.ticket_type_id;
-
-    -- You can define max ticket count elsewhere (e.g., EVENTS or TICKET_TYPES)
-    -- For now, assume it's 100 per event+type (adjust as needed)
-    IF total_tickets >= 100 THEN
-        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
-        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
-
-        SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No tickets available. Buyer added to resale queue.';
-    END IF;
-END;
-//
 
 -- Check review eligibility
 DROP TRIGGER IF EXISTS check_review_ticket_scanned;
@@ -433,7 +411,7 @@ END
 
 //
 
--- Check 3 consequtive years
+-- Check 3 consecutive years
 DROP TRIGGER IF EXISTS check_4th_year;
 CREATE TRIGGER check_4th_year
 BEFORE INSERT ON PERFORMANCES
@@ -501,13 +479,17 @@ BEGIN
     WHERE event_id = NEW.event_id AND ticket_type_name = 'VIP';
 
     IF ticket_count >= cap THEN
+        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
+        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'Exceeded stage capacity. No more tickets available.';
+        SET MESSAGE_TEXT = 'Exceeded stage capacity. No more tickets available. Added buyer to queue';
     END IF;
 
     IF vip_count >= 0.1*cap THEN
+        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
+        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
         SIGNAL SQLSTATE '45000'
-        SET MESSAGE_TEXT = 'No more VIP tickets available';
+        SET MESSAGE_TEXT = 'No more VIP tickets available. Added buyer to queue';
     END IF;
 END
 
