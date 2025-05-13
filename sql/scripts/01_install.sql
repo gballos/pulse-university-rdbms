@@ -317,7 +317,6 @@ BEGIN
 END;
 
 //
-
 DROP TRIGGER IF EXISTS delete_performance_after_band;
 CREATE TRIGGER delete_performance_after_band
 AFTER DELETE ON BANDS
@@ -326,34 +325,6 @@ BEGIN
     DELETE FROM PERFORMANCES
     WHERE performer_id = OLD.band_id AND is_solo = 0;
 END;
-
-//
-
--- Resale queue
-DROP TRIGGER IF EXISTS resale_queue;
-CREATE TRIGGER resale_queue
-AFTER INSERT ON TICKETS_FOR_RESALE
-FOR EACH ROW
-BEGIN
-    DECLARE matched_buyer_id INT;
-    DECLARE matched_resale_id INT;
-
-    -- Find first buyer requesting this ticket or a matching one
-    SELECT buyer_id INTO matched_buyer_id
-    FROM BUYERS
-    WHERE ticket_id = NEW.ticket_id
-     OR (BUYERS.ticket_type_id = NEW.ticket_type_id AND BUYERS.event_id = NEW.event_id)
-    ORDER BY buyer_id
-    LIMIT 1;
-
-    SET matched_resale_id = NEW.ticket_for_resale_id;
-
-    IF matched_buyer_id IS NOT NULL THEN
-    DELETE FROM BUYERS WHERE buyer_id = matched_buyer_id;
-    DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = matched_resale_id;
-    END IF;
-END;
-
 //
 
 -- Check review eligibility
@@ -493,6 +464,7 @@ BEGIN
     END IF;
 END
 
+-- Resale Queue | Matching
 //
 DROP PROCEDURE IF EXISTS match_resale_queue;
 CREATE PROCEDURE match_resale_queue()
