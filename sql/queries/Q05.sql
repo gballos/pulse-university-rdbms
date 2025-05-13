@@ -4,7 +4,7 @@ SELECT
     a.artist_id,
     a.first_name,
     a.last_name,
-    TIMESTAMPDIFF(YEAR, a.birthday, artist_festivals.event_date),
+    a.birthday,
     COUNT(DISTINCT artist_festivals.festival_id) AS festival_count
     
 FROM ARTISTS a
@@ -27,6 +27,6 @@ LEFT JOIN (
     WHERE p.is_solo = 0
 ) AS artist_festivals ON artist_festivals.artist_id = a.artist_id
     
-WHERE TIMESTAMPDIFF(YEAR, a.birthday, artist_festivals.event_date) < 30
+WHERE TIMESTAMPDIFF(YEAR, a.birthday, artist_festivals.event_date) < 30 AND TIMESTAMPDIFF(YEAR, a.birthday, artist_festivals.event_date) > 0
 GROUP BY a.artist_id
 ORDER BY festival_count DESC;
