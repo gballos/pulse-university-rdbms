@@ -13,10 +13,10 @@ SELECT
         WHEN participation.artist_id IS NOT NULL THEN 'Yes'
         ELSE 'No'
     END AS participated_in_year
+    
 FROM ARTISTS a
 JOIN ARTISTS_X_MUSIC am ON am.artist_id = a.artist_id
 JOIN MUSIC_TYPES mt ON mt.music_type_id = am.music_type_id
-
 LEFT JOIN (
     -- For solo artists
     SELECT DISTINCT p.performer_id AS artist_id
