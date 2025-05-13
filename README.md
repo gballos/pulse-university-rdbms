@@ -1,6 +1,6 @@
-# pulse-university-rdbms
+# Pulse University RDBMS
 
-***MANUAL:***
+## How to use the app
 
 **0.  If you are on Windows** 
 
@@ -12,11 +12,11 @@
 
 **2.  Build the docker with `./build.ps1` on Windows and  `./build.sh` on Linux**
 
-  This should initialize MySQL container and the database using the sql scripts in `pulse-universisty-rdbms/sql/scripts`. Make sure you have Dokcer Desktop active.
+  This should initialize MySQL container and the database using the sql scripts in `pulse-universisty-rdbms/sql/scripts`. Make sure you have Dokcer Desktop active. You can also check the logs of the installation process to check if any errors occured with `docker logs pulse_uni_db_container`.
 
-**3.  Connect MySQL Workbench**
+**3.  Connect to the DB in an IDE(i.e. MySQL Workbench)**
 
-  1.  Open MySQL Workbench
+  1.  Open IDE(i.e. MySQL Workbench)
     
   2.  Create a new connection
         - Hostname : `localhost`
@@ -25,7 +25,15 @@
         - Password : `mypassword` or `rootpassword` for root user
   3.  Click 'Test Connection' and Save
 
-**4.  Terminate Connection**
+**4.  Interact with the DB**
+
+  Now you can use your IDE of choice to execute queries, insert new data etc...
   
-  Using `docker compose down -v` shut down the database container
+**5.  Terminate Connection**
   
+  Once done you can use `docker compose down -v` to shut down the database container.
+
+## Features
+
+- Check staff assigned vs staff required for each event using the `staff_coverage_view`
+- **Resale Queue**: When somebody tries to buy a ticket but they are sold out he is logged as a **buyer** that wants to buy ticket for that specific event. If somebody changes his mind about his ticket and his ticket is unscanned he can list his ticket for salw. 
