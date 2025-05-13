@@ -32,4 +32,8 @@
 **5.  Terminate Connection**
   
   Once done you can use `docker compose down -v` to shut down the database container.
-  
+
+## Features
+
+- Check staff assigned vs staff required for each event using the `staff_coverage_view`
+- **Resale Queue**: When somebody tries to buy a ticket but they are sold out he is logged as a **buyer** that wants to buy ticket for that specific event. If somebody changes his mind about his ticket and his ticket is unscanned he can list his ticket for salw. 
