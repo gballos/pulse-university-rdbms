@@ -494,6 +494,81 @@ BEGIN
 END
 
 //
+DROP PROCEDURE IF EXISTS match_resale_queue;
+CREATE PROCEDURE match_resale_queue()
+BEGIN
+    DECLARE b_id INT;
+    DECLARE b_event INT;
+    DECLARE b_ticket INT;
+    DECLARE b_ticket_type INT;
+    DECLARE r_id INT;
+    DECLARE r_ticket INT;
+
+    match_loop: LOOP
+        SELECT buyer_id, event_id, ticket_type_id, ticket_id
+        INTO b_id, b_event, b_ticket_type, b_ticket
+        FROM BUYERS
+        ORDER BY requested_at
+        LIMIT 1;
+
+        -- No buyers left
+        IF b_id IS NULL THEN
+            LEAVE match_loop;
+        END IF;
+
+        -- Check if requested by id:
+        IF b_ticket IS NOT NULL THEN
+            SELECT ticket_for_resale_id
+            INTO r_id
+            FROM TICKETS_FOR_RESALE
+            WHERE ticket_id = b_ticket
+            ORDER BY listed_at
+            LIMIT 1;
+
+            IF r_id IS NOT NULL THEN
+                DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = r_id;
+                DELETE FROM BUYERS WHERE buyer_id = b_id;
+                ITERATE match_loop;
+            END IF;
+        END IF;
+
+        -- Otherwise match by event + type
+        SELECT ticket_for_resale_id, ticket_id
+        INTO r_id, r_ticket
+        FROM TICKETS_FOR_RESALE
+        WHERE event_id = b_event AND ticket_type_id = b_ticket_type
+        ORDER BY listed_at
+        LIMIT 1;
+
+        IF r_id IS NOT NULL THEN
+          DELETE FROM TICKETS_FOR_RESALE WHERE ticket_for_resale_id = r_id;
+          DELETE FROM BUYERS WHERE buyer_id = b_id;
+          ITERATE match_loop;
+        END IF;
+
+        -- If here no match found
+        LEAVE match_loop;
+    END LOOP match_loop;
+END //
+
+-- Run match for new entries
+//
+DROP TRIGGER IF EXISTS after_ticket_resale_insert;
+CREATE TRIGGER after_ticket_resale_insert
+AFTER INSERT ON TICKETS_FOR_RESALE
+FOR EACH ROW
+BEGIN
+    CALL match_resale_queue();
+END;
+//
+DROP TRIGGER IF EXISTS after_buyer_insert;
+CREATE TRIGGER after_buyer_insert
+AFTER INSERT ON BUYERS
+FOR EACH ROW
+BEGIN
+    CALL match_resale_queue();
+END;
+//
 
 DROP VIEW IF EXISTS staff_coverage_view;
 CREATE VIEW staff_coverage_view AS
