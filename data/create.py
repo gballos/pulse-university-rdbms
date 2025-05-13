@@ -15,8 +15,6 @@ N_STAFF = 2000
 N_VISITORS = 100
 N_TICKETS = 4000
 N_REVIEWS = 300
-N_BUYERS = 200
-N_RESALE_TICKETS = 50
 
 scanned_visitor_ids = []
 event_perf_ids = []
@@ -613,36 +611,6 @@ def fake_reviews(f):
             f.write(review)
             i += 1  
 
-# BUYERS
-def fake_buyers(f):
-    def build_buyer(buyer_id):
-        ticket_id = random.randint(1, N_TICKETS)
-        event_id = random.randint(1, N_EVENTS)
-        ticket_type_id = random.randint(1, 3)
-
-        return f"INSERT INTO BUYERS (buyer_id, event_id, ticket_type_id, ticket_id) VALUES ('{buyer_id}', '{event_id}', '{ticket_type_id}', '{ticket_id}');\n"
-
-    buyers = (build_buyer(i) for i in range(1, N_BUYERS + 1))
-
-    for buyer in buyers:
-        f.write(buyer)
-
-
-# TICKETS_FOR_RESALE
-def fake_tickets_for_resale(f):
-    def build_resale_ticket(resale_id):
-        ticket_id = random.randint(1, N_TICKETS)
-        event_id = random.randint(1, N_EVENTS)
-        ticket_type_id = random.randint(1, 3)
-
-        return f"INSERT INTO TICKETS_FOR_RESALE (ticket_for_resale_id, ticket_id, event_id, ticket_type_id) VALUES ('{resale_id}', '{ticket_id}', '{event_id}', '{ticket_type_id}');\n"
-
-    resale_tickets = (build_resale_ticket(i) for i in range(1, N_RESALE_TICKETS + 1))
-
-    for resale_ticket in resale_tickets:
-        f.write(resale_ticket)
-
-
 with open("03_load.sql", "w") as f:
     fake_locations(f)
     fake_festivals(f)
@@ -668,6 +636,4 @@ with open("03_load.sql", "w") as f:
     fake_tickets(f)
     fake_likert_ratings(f)
     fake_reviews(f)
-    fake_buyers(f)
-    fake_tickets_for_resale(f)
     fake_stages_x_technical_supply(f)
