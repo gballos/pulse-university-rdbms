@@ -353,6 +353,30 @@ BEGIN
 END;
 
 //
+DROP TRIGGER IF EXISTS redirect_to_queue
+CREATE TRIGGER redirect_to_queue
+BEFORE INSERT ON TICKETS
+FOR EACH ROW
+BEGIN
+    DECLARE total_tickets INT;
+    DECLARE sold_tickets INT;
+
+    SELECT COUNT(*) INTO total_tickets
+    FROM TICKETS
+    JOIN 
+    WHERE event_id = NEW.event_id AND ticket_type_id = NEW.ticket_type_id;
+
+    -- You can define max ticket count elsewhere (e.g., EVENTS or TICKET_TYPES)
+    -- For now, assume it's 100 per event+type (adjust as needed)
+    IF total_tickets >= 100 THEN
+        INSERT INTO BUYERS (event_id, ticket_type_id, ticket_id, requested_at)
+        VALUES (NEW.event_id, NEW.ticket_type_id, NULL, NOW());
+
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'No tickets available. Buyer added to resale queue.';
+    END IF;
+END;
+//
 
 -- Check review eligibility
 DROP TRIGGER IF EXISTS check_review_ticket_scanned;
