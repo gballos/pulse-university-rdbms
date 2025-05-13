@@ -1,0 +1,13 @@
++---------+-----------+---------+----+----------+--------------------+
+|artist_id|first_name |last_name|year|music_type|participated_in_year|
++---------+-----------+---------+----+----------+--------------------+
+|221      |Micheal    |Davies   |2005|Jazz      |Yes                 |
+|65       |Rachel     |Brown    |2005|Jazz      |No                  |
+|28       |Ryan       |Bullock  |2005|Jazz      |No                  |
+|182      |Rachel     |Burgess  |2005|Jazz      |No                  |
+|24       |Jonathan   |Floyd    |2005|Jazz      |No                  |
+|19       |Laura      |Hall     |2005|Jazz      |No                  |
+|238      |Christopher|Hopkins  |2005|Jazz      |No                  |
+|211      |Chris      |Powers   |2005|Jazz      |No                  |
+|225      |Deborah    |Welch    |2005|Jazz      |No                  |
++---------+-----------+---------+----+----------+--------------------+

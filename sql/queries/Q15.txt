@@ -1,0 +1,9 @@
++------------------+----------------+-----------+
+|visitor_name      |artist_name     |total_score|
++------------------+----------------+-----------+
+|Tammy Wu          |Ryan Hernandez  |15         |
+|Christopher Carter|Brittney Watkins|14         |
+|John Martinez     |Craig Roberts   |14         |
+|Katie Mcdowell    |Monique Klein   |13         |
+|Roger Hobbs       |Emma Ewing      |12         |
++------------------+----------------+-----------+
