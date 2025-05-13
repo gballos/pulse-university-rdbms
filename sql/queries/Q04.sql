@@ -17,7 +17,7 @@ WHERE a.artist_id = @artist_id
 GROUP BY a.artist_id;
 
 -- query with FORCE INDEX
-EXPLAIN ANALYZE
+-- EXPLAIN ANALYZE
 SELECT
     a.artist_id,
     a.first_name,
