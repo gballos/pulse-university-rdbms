@@ -7,6 +7,7 @@ SELECT
     a.artist_id,
     a.first_name,
     a.last_name,
+    @choose_year AS year,
     mt.music_type,
     CASE
         WHEN participation.artist_id IS NOT NULL THEN 'Yes'
