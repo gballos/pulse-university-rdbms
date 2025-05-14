@@ -21,6 +21,7 @@ JOIN PERFORMANCES p ON r.performance_id = p.performance_id
 WHERE r.visitor_id = @visitor_id
 GROUP BY r.visitor_id, r.performance_id, p.event_id, p.is_solo;
 
+SET @optimizer_switch='merge = on';
 -- query with FORCE INDEX
 EXPLAIN ANALYZE
 SELECT
