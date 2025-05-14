@@ -1,3 +1,5 @@
+USE pulse_uni_db;
+
 WITH solo_scores AS(
     SELECT
         r.visitor_id AS visitor_id,
