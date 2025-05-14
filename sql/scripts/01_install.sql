@@ -670,7 +670,7 @@ CREATE INDEX idx_events_performers ON PERFORMANCES(event_id, performer_id);
 CREATE INDEX idx_tickets_visitors_events ON TICKETS(visitor_id, event_id);
 
 -- performance-review related queries 4, 15
-CREATE INDEX idx_performances_performers ON PERFORMANCES(performance_id, performer_id);
+CREATE INDEX idx_performances_performers ON PERFORMANCES(performer_id, performance_id, is_solo);
 
 -- review related queries 4, 6, 9, 15
 CREATE INDEX idx_reviews_performance ON REVIEWS(performance_id);
