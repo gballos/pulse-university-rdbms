@@ -52,6 +52,16 @@
 
 - Durations in the database tables are in minutes.
 
-- We assume that one event reserves a stage for the entire given day regardless of event duration.
+- We assume that one event reserves a stage for the entire given day regardless of event duration. (Also, from the description, a 1:1 relationship between stages and performances is assumed.)
 
 - For Q12, we used the assumption that each event/stage requires 5 technical staff members.
+
+- There is a primary table called **Artists**, which stores artist information. In the **Performances** table, the `performer_id` is inserted, along with a boolean variable `is_solo`:
+
+    - If `is_solo` is set to 0, this means the artist performs solo, and the `artist_id` is inserted.
+    
+    - If `is_solo` is set to 1, this means the performance involves a band, and the corresponding `band_id` is inserted.
+    
+    - The participating artists for a band performance are retrieved based on the **artists_x_bands** table.
+
+- It is assumed that the types within each category (e.g., `payment_methods`, `music_types`, `staff_categories`, etc.) are the ones inserted during initial setup and **will never get deleted**. Therefore, there is **no need to implement triggers** for cascading deletions of foreign keys in these tables.
